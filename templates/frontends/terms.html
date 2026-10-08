@@ -1,0 +1,539 @@
+{% extends "frontends/base.html" %}
+{% load static %}
+
+{% block title %}Terms & Conditions | Malabar{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Fonts: none set here. Everything inherits from base.html / custom.css */
+
+    /* ================= HERO ================= */
+    .page-header.terms-hero {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        min-height: 80vh;                 /* same as About page hero */
+        display: flex;
+        align-items: center;
+        padding: 200px 0 120px !important;
+        background-color: #222 !important;
+        background-image:
+            linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),
+            url('{% static "malabar-static/mr5.webp" %}') !important;
+        background-size: cover, cover !important;
+        background-position: center, center !important;
+        background-repeat: no-repeat, no-repeat !important;
+    }
+    .page-header.terms-hero::before,
+    .page-header.terms-hero::after { display: none !important; }
+    .page-header.terms-hero .page-header-box { text-align: center; }
+    .page-header.terms-hero h1 {
+        font-size: 80px;
+        letter-spacing: 4px;
+        color: #f7e3d2 !important;
+        text-transform: none !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+        margin-bottom: 20px;
+    }
+    .page-header.terms-hero .breadcrumb { justify-content: center; margin: 0; }
+    .page-header.terms-hero .breadcrumb-item,
+    .page-header.terms-hero .breadcrumb-item a,
+    .page-header.terms-hero .breadcrumb-item + .breadcrumb-item::before {
+        color: #f7e3d2 !important;
+        text-transform: capitalize;
+    }
+
+    /* ================= TERMS SECTION ================= */
+    .terms-section {
+        /* ---- change these to restyle the whole page ---- */
+        --tc-accent: var(--primary-color, #111111);
+        --tc-hover: #c9972b;                 /* gold highlight */
+        --tc-soft: #f4ece3;
+        --tc-active-bg: #1d1a17;             /* ACTIVE CARD colour */
+        --tc-active-text: #f3e9dd;           /* text on the active card */
+        --tc-active-muted: #b9ab98;          /* number / secondary text on active card */
+
+        padding: 90px 0 110px;
+        background-color: #faf8f6;
+        background-image:
+            linear-gradient(rgba(252, 247, 246, 0.45), rgba(252, 247, 246, 0.45)),
+            url('{% static "malabar-static/mr5.png" %}');
+        background-size: cover, cover;
+        background-position: center, center;
+        background-repeat: no-repeat, no-repeat;
+        background-attachment: scroll, fixed;   /* image stays still while cards scroll */
+    }
+    .terms-section { overflow-x: clip; }   /* stops the slide-in animations causing sideways scroll (keeps sticky working) */
+    .terms-section .container { max-width: 1200px; }
+    .terms-section .section-row { margin-bottom: 50px; }
+
+    .terms-layout {
+        display: grid;
+        grid-template-columns: 250px minmax(0, 1fr);   /* minmax(0) stops wide children stretching the column */
+        gap: 50px;
+        align-items: start;
+    }
+    .terms-side, .terms-content { min-width: 0; }
+
+    /* ---------- Left menu ---------- */
+    .terms-side {
+        position: sticky;
+        top: 140px;           /* clears the floating navbar */
+    }
+    .terms-side-label {
+        font-size: 11px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: #8a8a8a;
+        margin-bottom: 18px;
+    }
+
+    /* reading progress */
+    .terms-progress {
+        height: 4px;
+        background: #e4dccf !important;
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 18px;
+    }
+    .terms-progress-bar {
+        height: 100%;
+        width: 0;
+        background: var(--tc-hover) !important;
+        border-radius: 4px;
+        transition: width .35s ease;
+    }
+
+    .terms-nav { list-style: none; margin: 0; padding: 0; }
+    .terms-nav li { margin: 0 0 4px; }
+    .terms-nav a {
+        display: block;
+        padding: 11px 14px 11px 16px;
+        border-left: 4px solid transparent;
+        border-radius: 0 12px 12px 0;
+        background: transparent;
+        color: var(--text-color, #2b2b2b);
+        font-size: 15px;
+        transition: background-color .35s ease, color .35s ease, border-color .35s ease, padding .3s ease, transform .3s ease;
+    }
+    .terms-nav a:hover { color: var(--tc-hover); transform: translateX(3px); }
+
+    /* ACTIVE MENU ITEM: same look as the active card */
+    .terms-nav a.active {
+        background: var(--tc-active-bg) !important;
+        color: var(--tc-active-text) !important;
+        border-left-color: var(--tc-hover) !important;
+        font-weight: 500;
+        padding-left: 22px;
+        transform: none;
+        box-shadow: 0 8px 20px rgba(29, 26, 23, 0.18);
+    }
+
+    .terms-quote {
+        margin-top: 36px;
+        padding-top: 30px;
+        border-top: 1px solid #e4dccf;
+    }
+    .terms-quote p {
+        font-style: italic;
+        font-size: 17px;
+        line-height: 1.6;
+        color: #6f675d;
+        margin: 0 0 16px;
+    }
+    .terms-quote span { display: block; width: 34px; height: 2px; background: var(--tc-hover); }
+
+    /* ---------- Notice banner ---------- */
+    .terms-notice {
+        display: flex;
+        gap: 22px;
+        align-items: flex-start;
+        background: #f7e0d3;
+        border: 1px solid #efcfbd;
+        border-radius: 18px;
+        padding: 28px 30px;
+        margin-bottom: 26px;
+    }
+    .terms-notice-icon {
+        flex-shrink: 0;
+        width: 50px; height: 50px;
+        border-radius: 14px;
+        background: #fff;
+        color: var(--tc-hover);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px;
+    }
+    .terms-notice h2 { font-size: 20px; margin: 0 0 8px; text-transform: none; }
+    .terms-notice p { margin: 0; font-size: 15px; line-height: 1.7; }
+
+    /* ---------- Term cards ---------- */
+    .terms-card {
+        position: relative;
+        display: flex;
+        gap: 24px;
+        background: #fff;
+        border: 1px solid #eee5d8;
+        border-radius: 18px;
+        padding: 30px 34px;
+        margin-bottom: 22px;
+        scroll-margin-top: 130px;     /* keeps the title clear of the fixed navbar */
+        box-shadow: 0 6px 22px rgba(0, 0, 0, 0.04);
+        cursor: pointer;
+        overflow: hidden;
+        transition:
+            background-color .45s ease,
+            border-color .45s ease,
+            box-shadow .45s ease,
+            transform .35s ease;
+    }
+    /* gold bar that slides in on the active card */
+    .terms-card::before {
+        content: "";
+        position: absolute;
+        left: 0; top: 0; bottom: 0;
+        width: 5px;
+        background: var(--tc-hover);
+        transform: scaleY(0);
+        transform-origin: top;
+        transition: transform .45s ease;
+    }
+    .terms-card:hover { transform: translateY(-4px); box-shadow: 0 14px 34px rgba(0, 0, 0, 0.09); }
+
+    .terms-card-icon {
+        flex-shrink: 0;
+        width: 56px; height: 56px;
+        border-radius: 16px;
+        border: 1px solid #efd9c8;
+        background: #fdf3ea;
+        color: var(--tc-hover);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 22px;
+        transition: background-color .4s ease, border-color .4s ease, color .4s ease, transform .4s ease;
+    }
+    .terms-card-body { flex: 1; }
+    .terms-card h2 { font-size: 26px; margin: 0 0 12px; text-transform: none; transition: color .4s ease; }
+    .terms-card p { margin: 0 0 10px; font-size: 15px; line-height: 1.8; transition: color .4s ease; }
+    .terms-card p:last-child { margin-bottom: 0; }
+    .terms-card ul { margin: 0 0 10px; padding-left: 18px; font-size: 15px; line-height: 1.8; }
+    .terms-card a { color: var(--tc-hover); transition: color .3s ease; }
+    .terms-card a:hover { text-decoration: underline; }
+    .terms-card-no {
+        position: absolute;
+        top: 30px; right: 34px;
+        font-size: 15px;
+        color: #b9b0a3;
+        transition: color .4s ease;
+    }
+
+    /* ----- ACTIVE CARD (changes colour while it is the one being read / clicked) ----- */
+    .terms-card.is-active {
+        background: var(--tc-active-bg);
+        border-color: var(--tc-active-bg);
+        box-shadow: 0 18px 44px rgba(29, 26, 23, 0.28);
+    }
+    .terms-card.is-active::before { transform: scaleY(1); }
+    .terms-card.is-active h2 { color: var(--tc-active-text); }
+    .terms-card.is-active p { color: var(--tc-active-muted); }
+    .terms-card.is-active .terms-card-no { color: var(--tc-active-muted); }
+    .terms-card.is-active .terms-card-icon {
+        background: var(--tc-hover);
+        border-color: var(--tc-hover);
+        color: #fff;
+        transform: rotate(-6deg) scale(1.06);
+    }
+    .terms-card.is-active a { color: #e6b84f; }
+
+    .terms-card:focus-visible { outline: 3px solid var(--tc-hover); outline-offset: 3px; }
+
+    .terms-updated { margin-top: 10px; font-size: 13px; color: #8a8a8a; text-align: right; }
+
+    /* ---------- Reveal animation helpers (work with base's wow.js / animate.css) ---------- */
+    .terms-section .wow { visibility: hidden; }          /* wow.js reveals them */
+    .terms-section .wow.animated { visibility: visible; }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 991px) {
+        .page-header.terms-hero { min-height: 60vh; padding: 150px 0 80px !important; }   /* same as About page */
+        .page-header.terms-hero h1 { font-size: 48px; letter-spacing: 2px; }
+        .terms-section { background-attachment: scroll, scroll; }
+        .terms-layout { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+
+        /* menu becomes a scrolling row of pills */
+        .terms-side {
+            position: sticky; top: 90px; z-index: 5;
+            background: rgba(250, 248, 246, .95);
+            padding: 10px 0;
+            margin: 0 -12px;
+        }
+        .terms-side-label, .terms-quote { display: none; }
+        .terms-progress { margin: 0 12px 10px; }
+        .terms-nav {
+            display: flex; gap: 8px; overflow-x: auto;
+            padding: 0 12px; scrollbar-width: none;
+        }
+        .terms-nav::-webkit-scrollbar { display: none; }
+        .terms-nav li { margin: 0; }
+        .terms-nav a {
+            white-space: nowrap;
+            padding: 8px 16px;
+            border: 1px solid #e4dccf;
+            border-radius: 50px;
+            background: #fff;
+            font-size: 14px;
+        }
+        .terms-nav a:hover { transform: none; }
+        .terms-nav a.active {
+            padding-left: 16px;
+            background: var(--tc-active-bg) !important;
+            border-color: var(--tc-active-bg) !important;
+            color: var(--tc-active-text) !important;
+            box-shadow: none;
+        }
+        .terms-card { scroll-margin-top: 170px; }
+    }
+    @media (max-width: 575px) {
+        .page-header.terms-hero h1 { font-size: 34px; letter-spacing: 1px; }   /* hero height stays the same as About */
+
+        .terms-section { padding: 50px 0 70px; }
+        .terms-section .section-row { margin-bottom: 30px; }
+
+        .terms-side { top: 84px; }
+
+        .terms-notice { flex-direction: column; gap: 14px; padding: 20px; border-radius: 16px; }
+        .terms-notice h2 { font-size: 18px; }
+
+        .terms-card {
+            flex-direction: column;
+            gap: 14px;
+            padding: 22px 20px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            scroll-margin-top: 160px;
+        }
+        .terms-card-icon { width: 46px; height: 46px; border-radius: 13px; font-size: 18px; }
+        .terms-card h2 { font-size: 22px; padding-right: 36px; }   /* leaves room for the 01 number */
+        .terms-card p, .terms-card ul { font-size: 14.5px; line-height: 1.7; }
+        .terms-card-no { top: 22px; right: 20px; font-size: 14px; }
+        .terms-card:hover { transform: none; }                     /* no hover jump on touch screens */
+        .terms-card.is-active .terms-card-icon { transform: none; }
+        .terms-updated { text-align: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .terms-card, .terms-card *, .terms-nav a, .terms-progress-bar { transition: none !important; }
+        .terms-section .wow { visibility: visible !important; animation: none !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<div class="page-header terms-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header-box">
+                    <h1 class="text-anime-style-3" data-cursor="-opaque">Terms &amp; Conditions</h1>
+                    <nav class="wow fadeInUp" data-wow-delay="0.2s">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'home' %}">home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">terms &amp; conditions</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Terms -->
+<section class="terms-section">
+    <div class="container">
+
+        <!-- Section heading -->
+        <div class="row section-row">
+            <div class="col-lg-12">
+                <div class="section-title section-title-center">
+                    <h3 class="wow fadeInUp">before you travel</h3>
+                    <h2 class="text-anime-style-3" data-cursor="-opaque">Clear Terms for a Smooth Journey</h2>
+                    <p class="wow fadeInUp" data-wow-delay="0.2s">A short, plain-language guide to how bookings work with Malabar Routes.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="terms-layout">
+
+            <!-- Left menu -->
+            <aside class="terms-side wow fadeInLeft" data-wow-delay="0.1s">
+                <div class="terms-side-label">On this page</div>
+                <div class="terms-progress" aria-hidden="true"><div class="terms-progress-bar" id="termsProgress"></div></div>
+                <ul class="terms-nav" id="termsNav">
+                    <li><a href="#bookings" class="active">Bookings &amp; payments</a></li>
+                    <li><a href="#changes">Changes &amp; cancellations</a></li>
+                    <li><a href="#documents">Travel documents</a></li>
+                    <li><a href="#insurance">Insurance &amp; safety</a></li>
+                    <li><a href="#responsibilities">Our responsibilities</a></li>
+                    <li><a href="#contact">Contact us</a></li>
+                </ul>
+
+                <div class="terms-quote">
+                    <p>&ldquo;Better journeys begin with clear understanding.&rdquo;</p>
+                    <span></span>
+                </div>
+            </aside>
+
+            <!-- Right content -->
+            <div class="terms-content">
+
+                <div class="terms-notice wow fadeInUp" data-wow-delay="0.15s">
+                    <div class="terms-notice-icon"><i class="fa-regular fa-file-lines"></i></div>
+                    <div>
+                        <h2>Please read these terms before confirming your trip.</h2>
+                        <p>These Terms &amp; Conditions explain how bookings work, what's included, and the responsibilities of both you and Malabar Routes.</p>
+                    </div>
+                </div>
+
+                <article class="terms-card wow fadeInRight" data-wow-delay="0.1s" id="bookings" tabindex="0">
+                    <div class="terms-card-icon"><i class="fa-regular fa-calendar-check"></i></div>
+                    <div class="terms-card-body">
+                        <h2>Bookings &amp; payments</h2>
+                        <p>A booking is confirmed once we receive your completed booking form and a deposit payment. The remaining balance is due by the specified date, which will be shared with you in your booking confirmation.</p>
+                        <p>Prices are quoted in the currency stated and may change because of factors beyond our control, such as currency fluctuations, fuel costs or local taxes.</p>
+                    </div>
+                    <span class="terms-card-no">01</span>
+                </article>
+
+                <article class="terms-card wow fadeInRight" data-wow-delay="0.15s" id="changes" tabindex="0">
+                    <div class="terms-card-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+                    <div class="terms-card-body">
+                        <h2>Changes &amp; cancellations</h2>
+                        <p>If you need to change or cancel your trip, tell us as soon as possible and we'll do our best to help, subject to availability and any applicable fees.</p>
+                        <p>Cancellation charges depend on the timing of your request and the terms of our suppliers (hotels, airlines, houseboats and transport). Full details are given at the time of booking.</p>
+                    </div>
+                    <span class="terms-card-no">02</span>
+                </article>
+
+                <article class="terms-card wow fadeInRight" data-wow-delay="0.15s" id="documents" tabindex="0">
+                    <div class="terms-card-icon"><i class="fa-solid fa-passport"></i></div>
+                    <div class="terms-card-body">
+                        <h2>Travel documents</h2>
+                        <p>You are responsible for holding a valid passport, visa (if required) and any other documents needed for your destination before you travel. Please check the latest entry requirements for your destination.</p>
+                        <p>We are happy to provide general guidance, and our visa and passport services can help with applications, but the responsibility for having the correct documents stays with you.</p>
+                    </div>
+                    <span class="terms-card-no">03</span>
+                </article>
+
+                <article class="terms-card wow fadeInRight" data-wow-delay="0.15s" id="insurance" tabindex="0">
+                    <div class="terms-card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="terms-card-body">
+                        <h2>Insurance &amp; safety</h2>
+                        <p>We strongly recommend comprehensive travel insurance covering medical expenses, trip cancellation, lost luggage and other unforeseen events.</p>
+                        <p>Please follow local advice and safety guidelines while travelling. Your safety is important to us, and we will always aim to give you up-to-date information on your destination.</p>
+                    </div>
+                    <span class="terms-card-no">04</span>
+                </article>
+
+                <article class="terms-card wow fadeInRight" data-wow-delay="0.15s" id="responsibilities" tabindex="0">
+                    <div class="terms-card-icon"><i class="fa-solid fa-handshake"></i></div>
+                    <div class="terms-card-body">
+                        <h2>Our responsibilities</h2>
+                        <p>Malabar Routes acts as a travel planner and tour agency, working with trusted local suppliers to create memorable experiences. While we carefully select our partners, we are not liable for circumstances beyond our control, such as natural events, political unrest, transport delays, or changes made by third-party providers.</p>
+                    </div>
+                    <span class="terms-card-no">05</span>
+                </article>
+
+                <article class="terms-card wow fadeInRight" data-wow-delay="0.15s" id="contact" tabindex="0">
+                    <div class="terms-card-icon"><i class="fa-regular fa-envelope"></i></div>
+                    <div class="terms-card-body">
+                        <h2>Contact us</h2>
+                        <p>If you have any questions about these Terms &amp; Conditions, please get in touch. Our team is here to help and will always do our best to give a clear and timely answer.</p>
+                        <p>
+                            Phone: <a href="tel:{{ info.phone_link }}">{{ info.phone }}</a><br>
+                            Email: <a href="mailto:{{ info.email }}">{{ info.email }}</a>
+                        </p>
+                    </div>
+                    <span class="terms-card-no">06</span>
+                </article>
+
+                <p class="terms-updated wow fadeInUp">Last updated: {{ last_updated }}</p>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var links = document.querySelectorAll('#termsNav a');
+        var progress = document.getElementById('termsProgress');
+        var sections = [];
+        var lockUntil = 0;   // stops the scroll-spy fighting a smooth scroll that was just clicked
+
+        links.forEach(function (a) {
+            var el = document.querySelector(a.getAttribute('href'));
+            if (el) sections.push({ link: a, el: el });
+
+            // smooth scroll (the card's scroll-margin keeps it below the navbar)
+            a.addEventListener('click', function (e) {
+                if (!el) return;
+                e.preventDefault();
+                lockUntil = Date.now() + 700;
+                setActive({ link: a, el: el });
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                history.replaceState(null, '', a.getAttribute('href'));
+            });
+        });
+
+        // clicking (or pressing Enter/Space on) a card makes it the active one
+        sections.forEach(function (s) {
+            s.el.addEventListener('click', function (e) {
+                if (e.target.closest('a')) return;      // let phone / email links work normally
+                setActive(s);
+            });
+            s.el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActive(s); }
+            });
+        });
+
+        function setActive(s) {
+            links.forEach(function (l) { l.classList.remove('active'); });
+            s.link.classList.add('active');
+
+            sections.forEach(function (x) { x.el.classList.toggle('is-active', x === s); });
+
+            if (progress) {
+                var i = sections.indexOf(s);
+                progress.style.width = ((i + 1) / sections.length * 100) + '%';
+            }
+
+            // on mobile, keep the active pill visible in the scrolling row
+            var nav = document.getElementById('termsNav');
+            if (nav.scrollWidth > nav.clientWidth) {
+                nav.scrollTo({ left: s.link.offsetLeft - 20, behavior: 'smooth' });
+            }
+        }
+
+        // the card you are reading becomes active
+        function onScroll() {
+            if (Date.now() < lockUntil) return;
+            var marker = window.innerHeight * 0.4;
+            var current = sections[0];
+            sections.forEach(function (s) {
+                if (s.el.getBoundingClientRect().top <= marker) current = s;
+            });
+            // at the very bottom, the last section is active
+            if (window.innerHeight + window.pageYOffset >= document.body.scrollHeight - 4) {
+                current = sections[sections.length - 1];
+            }
+            if (current) setActive(current);
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    })();
+</script>
+{% endblock %}

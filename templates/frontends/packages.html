@@ -1,0 +1,402 @@
+{% extends "frontends/base.html" %}
+{% load static %}
+
+{% block title %}Packages | Malabar{% endblock %}
+
+{% comment %}
+    Hero = same design as the About page hero (inset, rounded, Cinzel title).
+    Each card has Book Now (opens the booking modal from base.html via .open-booking)
+    and Explore (opens the package detail page).
+{% endcomment %}
+
+{% block extra_css %}
+<style>
+    /* ================= HERO (same design as About page) ================= */
+    .page-header.page-hero {
+        width: calc(100% - 32px) !important;      /* white gap on left and right */
+        max-width: calc(100% - 32px) !important;
+        margin: 16px 16px 0 !important;           /* white gap on top */
+        border-radius: 40px !important;           /* rounded corners */
+        overflow: hidden !important;              /* clips the image to the curve */
+        min-height: calc(80vh - 16px);
+        display: flex;
+        align-items: center;
+        padding: 200px 0 120px !important;
+        background-color: #222 !important;
+        background-image:
+            linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),
+            url('{% static "malabar-static/mr5.webp" %}') !important;
+        background-size: cover, cover !important;
+        background-position: center, center !important;
+        background-repeat: no-repeat, no-repeat !important;
+    }
+    .page-header.page-hero::before,
+    .page-header.page-hero::after { display: none !important; }
+
+    .page-hero .page-header-box { text-align: center; }
+
+  .page-header.page-hero h1 {
+    font-family: 'Cinzel', serif !important;
+    font-weight: 700 !important;
+    font-size: 80px;
+    letter-spacing: 6px;
+    color: #f7e3d2 !important;
+    text-transform: none !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    margin-bottom: 20px;
+}
+
+    .page-hero .breadcrumb { justify-content: center; margin: 0; }
+    .page-hero .breadcrumb-item,
+    .page-hero .breadcrumb-item a,
+    .page-hero .breadcrumb-item + .breadcrumb-item::before {
+        color: #f7e3d2 !important;
+        text-transform: capitalize;
+    }
+
+    /* ================= SECTION (bg fits full width, no side cropping) ================= */
+    .pk-section {
+        padding: 100px 0 120px; background-color: #faf8f6;
+        background-image:
+            linear-gradient(rgba(252, 247, 246, 0.55), rgba(252, 247, 246, 0.55)),
+            url('{% static "malabar-static/bg4.png" %}');
+        background-size: 100% 100%, 100% auto;
+        background-position: center, center top;
+        background-repeat: no-repeat, repeat-y;
+    }
+    .pk-section .container { max-width: 1320px; }
+
+    /* ================= SECTION HEADING ================= */
+    .pk-head { text-align: center; max-width: 760px; margin: 0 auto 60px; }
+    .pk-eyebrow {
+        display: inline-block; font-size: 14px; font-weight: 600; letter-spacing: 3px;
+        text-transform: uppercase; color: #2f4a3a; margin-bottom: 14px;
+    }
+    .pk-head h2 {
+        font-size: 48px; font-weight: 700; line-height: 1.2; color: #1b1b1b;
+        margin: 0 0 16px; padding: 0; text-transform: none;
+    }
+    .pk-head h2::before, .pk-head h2::after { display: none !important; content: none !important; }
+    .pk-head p { font-size: 18px; line-height: 1.8; color: #5a524a; margin: 0; }
+
+    /* ================= SCROLL ANIMATION (replays every time) ================= */
+    .pk-col, .pk-head {
+        opacity: 0;
+        transform: translateY(70px);
+        transition: opacity .7s ease, transform .8s cubic-bezier(.2,.7,.2,1);
+    }
+    .pk-col.in-view, .pk-head.in-view { opacity: 1; transform: translateY(0); }
+    .pk-col.in-view.pk-delay { transition-delay: .2s; }
+
+    .pk-card .pk-img {
+        clip-path: inset(0 0 100% 0);
+        transition: clip-path 1s cubic-bezier(.65,0,.15,1);
+    }
+    .pk-card .pk-img img {
+        transform: scale(1.25);
+        transition: transform 1.4s cubic-bezier(.2,.7,.2,1);
+    }
+    .pk-col.in-view .pk-img { clip-path: inset(0 0 0 0); }
+    .pk-col.in-view .pk-img img { transform: scale(1); }
+
+    /* ================= CARD ================= */
+    .pk-card {
+        position: relative; display: flex; flex-direction: column; justify-content: flex-end;
+        height: 600px; border-radius: 20px; overflow: hidden; color: #fff;
+        background-color: #222;
+        box-shadow: 0 8px 28px rgba(0,0,0,.12);
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .pk-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(0,0,0,.2); }
+
+    .pk-card .pk-img {
+        position: absolute; inset: 0; z-index: 0; margin: 0;
+        width: 100%; height: 100%; overflow: hidden;
+    }
+    .pk-card .pk-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .pk-card::before {
+        content: ""; position: absolute; inset: 0; z-index: 1;
+        background: linear-gradient(to top, rgba(0,0,0,.88) 0%, rgba(0,0,0,.4) 45%, rgba(0,0,0,0) 75%);
+        transition: background .35s ease;
+        pointer-events: none;
+    }
+    .pk-card:hover::before {
+        background: linear-gradient(to top, rgba(0,0,0,.94) 0%, rgba(0,0,0,.78) 60%, rgba(0,0,0,.3) 100%);
+    }
+
+    .pk-route {
+        position: absolute; right: 0; bottom: 190px; z-index: 2; width: 110px; height: 50px;
+        border-top: 2px dashed rgba(255,255,255,.7); border-left: 2px dashed rgba(255,255,255,.7);
+        border-top-left-radius: 100% 100%; opacity: .6; pointer-events: none;
+    }
+
+    .pk-body { position: relative; z-index: 3; padding: 32px 34px; }
+
+    .pk-body h3 {
+        color: #fff; font-size: 36px; font-weight: 700; line-height: 1.2;
+        margin: 0 0 10px; text-transform: none;
+        transition: font-size .35s ease, transform .35s ease;
+    }
+    .pk-card:hover .pk-body h3 { font-size: 40px; transform: translateY(-4px); }
+    .pk-body h3::before, .pk-body h3::after { display: none !important; content: none !important; }
+    .pk-body h3 a { color: inherit; text-decoration: none; }
+
+    .pk-desc {
+        margin: 0; font-size: 22px; line-height: 1.7; font-weight: 400;
+        color: rgba(255,255,255,.96);
+        max-height: 0; opacity: 0; overflow: hidden; transform: translateY(14px);
+        transition: max-height .5s ease, opacity .4s ease, margin .4s ease, transform .4s ease;
+    }
+    .pk-card:hover .pk-desc { max-height: 340px; opacity: 1; margin: 0 0 18px; transform: translateY(0); }
+
+    .pk-meta { display: flex; align-items: center; gap: 16px; font-size: 17px; opacity: .95; margin-bottom: 18px; }
+
+    /* footer: price on top, buttons below */
+    .pk-foot { display: flex; flex-direction: column; gap: 16px; }
+    .pk-price small { font-size: 16px; opacity: .85; margin-right: 8px; }
+    .pk-price strong { font-size: 32px; font-weight: 600; }
+
+    .pk-actions { display: flex; gap: 12px; }
+    .pk-btn {
+        flex: 1;
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        border-radius: 40px;
+        padding: 12px 20px; font-size: 16px; font-weight: 600; line-height: 1.2;
+        text-decoration: none; white-space: nowrap;
+        transition: background .25s ease, color .25s ease, border-color .25s ease;
+    }
+    .pk-btn i { font-size: 13px; transition: transform .25s ease; }
+    .pk-btn:hover i { transform: translateX(4px); }
+
+    /* Book Now: filled */
+    .pk-btn-fill {
+        background: #f7e3d2;
+        border: 1.5px solid #f7e3d2;
+        color: #12281f !important;
+    }
+    .pk-btn-fill:hover { background: #c9972b; border-color: #c9972b; color: #fff !important; }
+
+    /* Explore: outlined */
+    .pk-btn-line {
+        background: transparent;
+        border: 1.5px solid rgba(255,255,255,.85);
+        color: #fff !important;
+    }
+    .pk-btn-line:hover { background: #fff; border-color: #fff; color: #1b1b1b !important; }
+
+    .pk-empty { text-align: center; font-size: 18px; color: #5a524a; padding: 60px 0; }
+
+    @media (hover: none) {
+        .pk-desc { max-height: 340px; opacity: 1; margin: 0 0 18px; transform: none; }
+        .pk-card::before {
+            background: linear-gradient(to top, rgba(0,0,0,.94) 0%, rgba(0,0,0,.78) 60%, rgba(0,0,0,.3) 100%);
+        }
+    }
+
+    @media (max-width: 991px) {
+        .page-header.page-hero {
+            width: calc(100% - 20px) !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px 10px 0 !important;
+            border-radius: 24px !important;
+            min-height: 60vh;
+            padding: 150px 0 80px !important;
+        }
+        .page-header.page-hero h1 { font-size: 48px; letter-spacing: 3px; }
+        .pk-section { padding: 70px 0 80px; }
+        .pk-head { margin-bottom: 44px; }
+        .pk-head h2 { font-size: 36px; }
+        .pk-card { height: 560px; }
+        .pk-col.in-view.pk-delay { transition-delay: 0s; }
+    }
+    @media (max-width: 575px) {
+        .page-header.page-hero h1 { font-size: 36px; letter-spacing: 2px; }
+        .pk-head h2 { font-size: 28px; }
+        .pk-head p { font-size: 16px; }
+        .pk-card { height: 610px; }
+        .pk-body { padding: 24px 22px; }
+        .pk-body h3, .pk-card:hover .pk-body h3 { font-size: 28px; }
+        .pk-desc { font-size: 17px; }
+        .pk-price strong { font-size: 26px; }
+        .pk-btn { padding: 11px 12px; font-size: 15px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .pk-col, .pk-head, .pk-card .pk-img, .pk-card .pk-img img { transition: none; }
+        .pk-col, .pk-head { opacity: 1; transform: none; }
+        .pk-card .pk-img { clip-path: none; }
+        .pk-card .pk-img img { transform: none; }
+    }
+        /* ================= MOBILE: hero same as About page ================= */
+    @media (max-width: 991px) {
+        .page-header.page-hero {
+            width: calc(100% - 20px) !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px 10px 0 !important;
+            border-radius: 24px !important;
+            min-height: 46vh !important;
+            padding: 130px 0 65px !important;
+        }
+        .page-header.page-hero .page-header-box,
+        .page-header.page-hero h1,
+        .page-header.page-hero nav {
+            text-align: center !important;
+            width: 100%;
+        }
+        .page-header.page-hero h1 {
+            font-size: 34px !important;
+            letter-spacing: 2px !important;
+            margin-bottom: 14px !important;
+        }
+        .page-header.page-hero .breadcrumb {
+            justify-content: center !important;
+            font-size: 14px;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .page-header.page-hero h1 {
+            font-size: 28px !important;
+            letter-spacing: 1.5px !important;
+        }
+    }
+        /* ================= MOBILE: package card buttons sized to fit ================= */
+    @media (max-width: 991px) {
+        .pk-actions { gap: 10px; }
+        .pk-btn {
+            padding: 11px 14px;
+            font-size: 14.5px;
+        }
+    }
+
+    @media (max-width: 575px) {
+        .pk-foot { gap: 12px; }
+        .pk-price small { font-size: 14px; }
+        .pk-price strong { font-size: 24px; }
+
+        .pk-actions { gap: 8px; }
+        .pk-btn {
+            padding: 9px 10px;
+            font-size: 13px;
+            gap: 6px;
+            border-width: 1.2px;
+        }
+        .pk-btn i { font-size: 10px; }
+
+        /* the card is a little shorter now that the buttons are smaller */
+        .pk-card { height: 580px; }
+    }
+
+    @media (max-width: 360px) {
+        .pk-btn { padding: 8px 8px; font-size: 12px; }
+        .pk-price strong { font-size: 22px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero (same design as About page) -->
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&display=swap" rel="stylesheet">
+
+<div class="page-header page-hero">
+    <div class="container"><div class="row"><div class="col-lg-12">
+        <div class="page-header-box">
+            <h1 class="text-anime-style-3" data-cursor="-opaque">Our Packages</h1>
+            <nav class="wow fadeInUp" data-wow-delay="0.3s"><ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">packages</li>
+            </ol></nav>
+        </div>
+    </div></div></div>
+</div>
+
+<!-- Packages -->
+<section class="pk-section">
+    <div class="container">
+
+        <!-- Section heading -->
+        <div class="pk-head">
+            <span class="pk-eyebrow">Tour Packages</span>
+            <h2>Explore Our Tour Packages</h2>
+            <p>Handpicked journeys across Kerala and beyond, planned with care so you can enjoy every moment.</p>
+        </div>
+
+        <div class="row g-4 g-xl-5">
+            {% for package in packages %}
+            <div class="col-lg-6 col-md-6 pk-col{% if not forloop.counter0|divisibleby:2 %} pk-delay{% endif %}">
+
+                <div class="pk-card">
+
+                    <figure class="pk-img">
+                        <img src="{% if package.main_image %}{{ package.main_image.url }}{% else %}{% static 'malabar-static/mr5.webp' %}{% endif %}"
+                             alt="{{ package.name }}">
+                    </figure>
+
+                    <span class="pk-route"></span>
+
+                    <div class="pk-body">
+                        <h3><a href="{% url 'package_detail' package.slug %}">{{ package.name }}</a></h3>
+
+                        {% if package.description %}
+                        <p class="pk-desc">{{ package.description|striptags|safe|truncatewords:28 }}</p>
+                        {% endif %}
+
+                        {% if package.duration %}
+                        <div class="pk-meta"><span>{{ package.duration }}</span></div>
+                        {% endif %}
+
+                        <div class="pk-foot">
+                            {% if package.price_from %}
+                            <div class="pk-price">
+                                <small>From</small><strong>₹{{ package.price_from|floatformat:"0g" }}</strong>
+                            </div>
+                            {% endif %}
+
+                            <div class="pk-actions">
+                                <!-- opens the booking modal from base.html, with the package name -->
+                                <a href="#" class="pk-btn pk-btn-fill open-booking" data-package="{{ package.name }}">
+                                    Book Now <i class="fa-solid fa-angles-right"></i>
+                                </a>
+                                <a href="{% url 'package_detail' package.slug %}" class="pk-btn pk-btn-line">
+                                    Explore <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12"><p class="pk-empty">No packages available right now.</p></div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    /* Replays the animation every time the heading or a card enters the screen */
+    (function () {
+        var items = document.querySelectorAll('.pk-col, .pk-head');
+        if (!items.length) return;
+
+        if (!('IntersectionObserver' in window)) {
+            items.forEach(function (c) { c.classList.add('in-view'); });
+            return;
+        }
+
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                } else {
+                    entry.target.classList.remove('in-view');
+                }
+            });
+        }, { threshold: 0.18, rootMargin: '0px 0px -8% 0px' });
+
+        items.forEach(function (c) { io.observe(c); });
+    })();
+</script>
+{% endblock %}

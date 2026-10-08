@@ -1,0 +1,368 @@
+{% extends "frontends/base.html" %}
+{% load static %}
+
+{% block title %}Activities | Malabar{% endblock %}
+
+{% comment %}
+    Fonts are NOT set on this page: they come from base.html.
+    Colours come from base.html (--accent-color, --primary-color).
+    Hero = same design as the About page (inset, rounded).
+    Book Now opens the booking modal from base.html (.open-booking + data-package).
+{% endcomment %}
+
+{% block extra_css %}
+<style>
+    /* ================= HERO (same design as About page) ================= */
+    .page-header.page-hero {
+        width: calc(100% - 32px) !important;      /* white gap on left and right */
+        max-width: calc(100% - 32px) !important;
+        margin: 16px 16px 0 !important;           /* white gap on top */
+        border-radius: 40px !important;           /* rounded corners */
+        overflow: hidden !important;              /* clips the image to the curve */
+        min-height: calc(80vh - 16px);
+        display: flex;
+        align-items: center;
+        padding: 200px 0 120px !important;
+        background-color: #222 !important;
+        background-image:
+            linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),
+            url('{% static "malabar-static/mr5.webp" %}') !important;
+        background-size: cover, cover !important;
+        background-position: center, center !important;
+        background-repeat: no-repeat, no-repeat !important;
+    }
+    .page-header.page-hero::before,
+    .page-header.page-hero::after { display: none !important; }
+
+    .page-hero .page-header-box { text-align: center; }
+  .page-header.page-hero h1 {
+    font-family: 'Cinzel', serif !important;
+    font-weight: 700 !important;
+    font-size: 80px;
+    letter-spacing: 6px;
+    color: #f7e3d2 !important;
+    text-transform: none !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+    margin-bottom: 20px;
+}
+    .page-hero .breadcrumb { justify-content: center; margin: 0; }
+    .page-hero .breadcrumb-item, .page-hero .breadcrumb-item a,
+    .page-hero .breadcrumb-item + .breadcrumb-item::before { color: #f7e3d2 !important; text-transform: capitalize; }
+
+    /* ================= SECTION (bg3.png background) ================= */
+    .act-section {
+        /* colours come from base.html */
+        --act-accent: var(--accent-color, #265648);
+        --act-dark: var(--primary-color, #1a1a1a);
+
+        padding: 100px 0 130px;
+        background-color: #faf8f6;
+        background-image:
+            linear-gradient(rgba(252, 247, 246, 0.55), rgba(252, 247, 246, 0.55)),
+            url('{% static "malabar-static/bg3.png" %}');
+        background-size: cover, cover;
+        background-position: center, center;
+        background-repeat: no-repeat, no-repeat;
+    }
+    .act-section .container { max-width: 1400px; }
+    .act-head { text-align: center; margin-bottom: 60px; }
+    .act-head h2 { font-weight: 700; font-size: 56px; color: #111; margin-bottom: 10px; }
+    .act-head p { color: #3d332a; font-weight: 500; margin: 0; }
+
+    /* ================= CARD (base = 3+ cards) ================= */
+    .act-card {
+        background: #fff; border-radius: 14px; overflow: hidden;
+        box-shadow: 0 8px 28px rgba(0,0,0,.07);
+        height: 100%; display: flex; flex-direction: column;
+        transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .act-card:hover { transform: translateY(-8px); box-shadow: 0 22px 46px rgba(0,0,0,.14); }
+
+    .act-card-img { position: relative; width: 100%; aspect-ratio: 1.75 / 1; overflow: hidden; background: #e9e4de; }
+    .act-card-img figure { margin: 0; width: 100%; height: 100%; }
+    .act-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+    .act-badge {
+        position: absolute; top: 18px; left: 18px; z-index: 3;
+        background: var(--act-accent); color: #fff;
+        font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+        padding: 8px 18px; border-radius: 30px;
+    }
+
+    .act-card-body { padding: 26px 30px 28px; display: flex; flex-direction: column; flex: 1; }
+
+    .act-card-body h3 {
+        font-size: 28px; font-weight: 500;
+        line-height: 1.25; color: #1b1b1b; margin: 0 0 10px;
+        text-transform: none; letter-spacing: 0; padding: 0;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .act-card-body h3::before, .act-card-body h3::after,
+    .act-card-body p::before,  .act-card-body p::after { display: none !important; content: none !important; }
+
+    .act-card-body p {
+        font-size: 15.5px; line-height: 1.65; color: #6b625a;
+        margin: 0 0 22px; max-width: 100%; padding: 0;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    /* footer: duration + price on top, buttons below */
+    .act-card-foot {
+        margin-top: auto; display: flex; flex-direction: column; gap: 18px;
+    }
+    .act-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 14px; font-size: 14.5px; color: #2b2b2b; font-weight: 500; }
+    .act-meta span { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+    .act-meta i { font-size: 15px; color: var(--act-accent); }
+    .act-meta .act-divider { width: 1px; height: 22px; background: rgba(0,0,0,.2); }
+
+    .act-actions { display: flex; gap: 12px; }
+    .act-btn {
+        flex: 1;
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        white-space: nowrap; border-radius: 40px;
+        font-size: 14.5px; font-weight: 600; line-height: 1.2;
+        padding: 13px 18px; text-decoration: none;
+        transition: all .3s ease;
+    }
+    .act-btn i { font-size: 12px; transition: transform .3s ease; }
+    .act-btn:hover i { transform: translateX(4px); }
+
+    /* Book Now: filled with the base.html accent colour */
+    .act-btn-fill {
+        background: var(--act-accent);
+        border: 1.5px solid var(--act-accent);
+        color: #fff !important;
+    }
+    .act-btn-fill:hover { filter: brightness(0.88); color: #fff !important; }
+
+    /* View Details: outlined, fills with the accent colour on hover */
+    .act-btn-line {
+        background: transparent;
+        border: 1.5px solid var(--act-accent);
+        color: var(--act-accent) !important;
+    }
+    .act-btn-line:hover { background: var(--act-accent); color: #fff !important; }
+
+    .act-empty { text-align: center; color: #6b625a; padding: 40px 0; }
+
+    /* ================= 2 CARDS: slightly larger ================= */
+    .act-n2 .act-card-img { aspect-ratio: 1.9 / 1; }
+    .act-n2 .act-card-body { padding: 28px 32px 30px; }
+    .act-n2 .act-card-body h3 { font-size: 31px; margin-bottom: 12px; }
+    .act-n2 .act-card-body p { font-size: 16px; margin-bottom: 26px; }
+    .act-n2 .act-meta { font-size: 15px; gap: 16px; }
+    .act-n2 .act-meta i { font-size: 16px; }
+    .act-n2 .act-badge { top: 20px; left: 20px; font-size: 12px; padding: 9px 18px; }
+    .act-n2 .act-btn { font-size: 15px; padding: 14px 20px; }
+
+    /* ================= 1 CARD: larger ================= */
+    .act-n1 .act-card-img { aspect-ratio: 2.1 / 1; }
+    .act-n1 .act-card-body { padding: 30px 34px 32px; }
+    .act-n1 .act-card-body h3 { font-size: 34px; margin-bottom: 12px; }
+    .act-n1 .act-card-body p { font-size: 16.5px; margin-bottom: 28px; -webkit-line-clamp: 3; }
+    .act-n1 .act-meta { font-size: 15.5px; gap: 18px; }
+    .act-n1 .act-meta i { font-size: 17px; }
+    .act-n1 .act-badge { top: 22px; left: 22px; font-size: 12.5px; padding: 10px 20px; }
+    .act-n1 .act-btn { font-size: 15.5px; padding: 15px 22px; }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 1399px) {
+        .act-card-body h3 { font-size: 25px; }
+        .act-card-body { padding: 22px 24px 24px; }
+        .act-meta { font-size: 13.5px; gap: 10px; }
+        .act-btn { padding: 12px 16px; font-size: 14px; }
+    }
+    @media (max-width: 1199px) {
+        .act-card-body h3 { font-size: 23px; }
+        .act-card-body p { font-size: 14.5px; }
+        .act-btn { padding: 11px 14px; font-size: 13px; }
+        .act-n2 .act-card-body h3 { font-size: 28px; }
+        .act-n1 .act-card-body h3 { font-size: 30px; }
+    }
+    @media (max-width: 991px) {
+        .page-header.page-hero {
+            width: calc(100% - 20px) !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px 10px 0 !important;
+            border-radius: 24px !important;
+            min-height: 60vh;
+            padding: 150px 0 80px !important;
+        }
+        .page-header.page-hero h1 { font-size: 48px; letter-spacing: 3px; }
+        .act-section { padding: 70px 0 80px; }
+        .act-head h2 { font-size: 42px; }
+        .act-card-body { padding: 24px 26px 26px; }
+        .act-card-body h3 { font-size: 26px; }
+        .act-card-body p { font-size: 15px; }
+        .act-meta { font-size: 14px; gap: 14px; }
+        .act-btn { padding: 12px 18px; font-size: 14px; }
+        .act-n2 .act-card-body, .act-n1 .act-card-body { padding: 24px 26px 26px; }
+        .act-n2 .act-card-body h3, .act-n1 .act-card-body h3 { font-size: 27px; }
+        .act-n2 .act-card-body p, .act-n1 .act-card-body p { font-size: 15.5px; }
+        .act-n2 .act-btn, .act-n1 .act-btn { font-size: 14px; padding: 12px 18px; }
+        .act-n2 .act-meta, .act-n1 .act-meta { font-size: 14px; gap: 14px; }
+    }
+    @media (max-width: 575px) {
+        .page-header.page-hero h1 { font-size: 36px; letter-spacing: 2px; }
+        .act-card-img, .act-n2 .act-card-img, .act-n1 .act-card-img { aspect-ratio: 1.6 / 1; }
+        .act-card-body, .act-n2 .act-card-body, .act-n1 .act-card-body { padding: 20px 20px 22px; }
+        .act-card-body h3, .act-n2 .act-card-body h3, .act-n1 .act-card-body h3 { font-size: 24px; }
+        .act-btn, .act-n2 .act-btn, .act-n1 .act-btn { padding: 12px 10px; font-size: 14px; }
+    }
+        /* ================= MOBILE: hero same as About page ================= */
+    @media (max-width: 991px) {
+        .page-header.page-hero {
+            width: calc(100% - 20px) !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px 10px 0 !important;
+            border-radius: 24px !important;
+            min-height: 46vh !important;
+            padding: 130px 0 65px !important;
+        }
+        .page-header.page-hero .page-header-box,
+        .page-header.page-hero h1,
+        .page-header.page-hero nav {
+            text-align: center !important;
+            width: 100%;
+        }
+        .page-header.page-hero h1 {
+            font-size: 34px !important;
+            letter-spacing: 2px !important;
+            margin-bottom: 14px !important;
+        }
+        .page-header.page-hero .breadcrumb {
+            justify-content: center !important;
+            font-size: 14px;
+        }
+
+        /* section heading */
+        .act-section { padding: 50px 0 60px; }
+        .act-head { margin-bottom: 36px; }
+        .act-head h2 { font-size: 32px; }
+        .act-head p { font-size: 15px; }
+    }
+
+    @media (max-width: 575px) {
+        .page-header.page-hero h1 {
+            font-size: 28px !important;
+            letter-spacing: 1.5px !important;
+        }
+
+        .act-head h2 { font-size: 28px; }
+
+        /* cards */
+        .act-card-body,
+        .act-n2 .act-card-body,
+        .act-n1 .act-card-body { padding: 18px 18px 20px; }
+        .act-card-body h3,
+        .act-n2 .act-card-body h3,
+        .act-n1 .act-card-body h3 { font-size: 21px; margin-bottom: 8px; }
+        .act-card-body p,
+        .act-n2 .act-card-body p,
+        .act-n1 .act-card-body p { font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+        .act-badge { top: 12px; left: 12px; font-size: 11px; padding: 6px 14px; }
+
+        /* duration + price */
+        .act-card-foot { gap: 14px; }
+        .act-meta,
+        .act-n2 .act-meta,
+        .act-n1 .act-meta { font-size: 13px; gap: 10px; }
+        .act-meta i,
+        .act-n2 .act-meta i,
+        .act-n1 .act-meta i { font-size: 14px; }
+        .act-meta .act-divider { height: 18px; }
+
+        /* buttons: Book Now + View Details side by side, compact */
+        .act-actions { gap: 8px; }
+        .act-btn,
+        .act-n2 .act-btn,
+        .act-n1 .act-btn {
+            padding: 10px 8px;
+            font-size: 13px;
+            gap: 6px;
+            border-width: 1.2px;
+        }
+        .act-btn i { font-size: 10px; }
+    }
+
+    @media (max-width: 360px) {
+        .act-btn,
+        .act-n2 .act-btn,
+        .act-n1 .act-btn { padding: 9px 6px; font-size: 12px; }
+        .act-card-body h3,
+        .act-n2 .act-card-body h3,
+        .act-n1 .act-card-body h3 { font-size: 19px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero (same design as About page) -->
+<div class="page-header page-hero">
+    <div class="container"><div class="row"><div class="col-lg-12">
+        <div class="page-header-box">
+            <h1>Activities</h1>
+            <nav><ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">home</a></li>
+                <li class="breadcrumb-item active" aria-current="page">activities</li>
+            </ol></nav>
+        </div>
+    </div></div></div>
+</div>
+
+<!-- Activities -->
+<section class="act-section">
+    <div class="container">
+        <div class="act-head">
+            <h2 class="text-anime-style-3" data-cursor="-opaque">Experiences in Malabar</h2>
+            <p class="wow fadeInUp" data-wow-delay="0.2s">Handpicked activities for every kind of traveller</p>
+        </div>
+
+        {% with total=activities|length %}
+        <div class="row g-4 {% if total == 1 %}act-n1{% elif total == 2 %}act-n2{% endif %}">
+            {% for a in activities %}
+            <div class="{% if total == 1 %}col-xl-6 col-lg-7 col-12{% elif total == 2 %}col-lg-6 col-12{% else %}col-xl-4 col-lg-4 col-md-6 col-12{% endif %}">
+                <div class="act-card wow fadeInUp" data-wow-delay="{% cycle '0.1s' '0.3s' '0.5s' %}">
+                    <div class="act-card-img">
+                        {% if a.category %}<span class="act-badge">{{ a.category }}</span>{% endif %}
+                        <figure class="image-anime reveal">
+                            <img src="{% if a.image %}{{ a.image.url }}{% else %}{% static 'malabar-static/mr5.webp' %}{% endif %}" alt="{{ a.title }}">
+                        </figure>
+                    </div>
+                    <div class="act-card-body">
+                        <h3>{{ a.title }}</h3>
+                        <p>{{ a.description|striptags|truncatewords:16 }}</p>
+                        <div class="act-card-foot">
+                            {% if a.duration or a.price %}
+                            <div class="act-meta">
+                                {% if a.duration %}
+                                <span><i class="fa-regular fa-clock"></i> {{ a.duration }}</span>
+                                {% endif %}
+                                {% if a.duration and a.price %}<span class="act-divider"></span>{% endif %}
+                                {% if a.price %}
+                                <span><i class="fa-solid fa-indian-rupee-sign"></i> From ₹{{ a.price }}</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <div class="act-actions">
+                                <!-- opens the booking modal from base.html, with the activity name -->
+                                <a href="#" class="act-btn act-btn-fill open-booking" data-package="{{ a.title }}">
+                                    Book Now <i class="fa-solid fa-angles-right"></i>
+                                </a>
+                                <a href="{% url 'activity_detail' a.slug %}" class="act-btn act-btn-line">
+                                    View Details <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12"><p class="act-empty">No activities available right now.</p></div>
+            {% endfor %}
+        </div>
+        {% endwith %}
+    </div>
+</section>
+{% endblock %}

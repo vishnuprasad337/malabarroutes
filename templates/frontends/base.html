@@ -1,0 +1,921 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <meta name="description" content="{% block meta_description %}{% endblock %}">
+    <meta name="keywords" content="{% block meta_keywords %}{% endblock %}">
+
+    <title>{% block title %}Malabar{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="{% static 'malabar-static/logo.webp' %}">
+    <link rel="shortcut icon" href="{% static 'malabar-static/logo.webp' %}">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Marcellus&display=swap" rel="stylesheet">
+
+    <!-- Template CSS -->
+    <link href="{% static 'malabar-static/css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'malabar-static/css/slicknav.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'malabar-static/css/swiper-bundle.min.css' %}">
+    <link href="{% static 'malabar-static/css/all.min.css' %}" rel="stylesheet" media="screen">
+    <link href="{% static 'malabar-static/css/animate.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'malabar-static/css/magnific-popup.css' %}">
+    <link rel="stylesheet" href="{% static 'malabar-static/css/mousecursor.css' %}">
+    <link rel="stylesheet" href="{% static 'malabar-static/css/twentytwenty.css' %}">
+    <link href="{% static 'malabar-static/css/custom.css' %}" rel="stylesheet" media="screen">
+
+    <!-- Logo sizing + floating pill navbar + booking modal (shared by every page) -->
+<style>
+    :root {
+        --primary-color: #111111;
+        --text-color: #2b2b2b;
+
+        /* ===== TEMPLATE OVERLAY GREEN (taken from your image) =====
+           Used by the dark overlay on top of every hero / page-header photo.
+           --overlay-opacity: higher = stronger green tint, lower = brighter photo (0 = no overlay). */
+        --brand-green: #265c44;
+        --overlay-opacity: 0.35;
+    }
+
+    /* The theme (custom.css) draws a dark overlay on top of the hero and page-header photos.
+       This replaces its colour with the green above, on every page.
+       It is placed here, in base.html, so no change to custom.css is needed. */
+    .hero .hero-section::before,
+    .hero-bg-image::before,
+    .page-header::before {
+        background: var(--brand-green) !important;
+        background-color: var(--brand-green) !important;
+        background-image: none !important;
+        opacity: var(--overlay-opacity) !important;
+    }
+
+    .footer-logo img { height: 100px; width: auto; }
+
+    .main-header {
+        position: fixed !important;
+        top: 36px;
+        left: 0 !important;
+        right: 0 !important;
+        margin: 0 auto !important;
+        width: min(1400px, calc(100% - 48px)) !important;
+        z-index: 1000;
+        background: transparent !important;
+    }
+    .main-header .header-sticky,
+    .main-header .header-sticky.hide,
+    .main-header .header-sticky.active {
+        position: relative !important;
+        transform: none !important;
+        top: 0 !important;
+
+        /* ===== TRANSPARENT WHITE NAVBAR + FADED PATTERN (nav.png) ===== */
+        background-color: rgba(255, 255, 255, 0.82) !important;   /* faded white: lower = more transparent, higher = more white */
+        /* image strength is built into nav.png */
+        background-image: url("{% static 'malabar-static/nav4.png' %}") !important;
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+background-position: center 70% !important;   /* move the pattern up/down */
+        backdrop-filter: blur(14px) saturate(160%);
+        -webkit-backdrop-filter: blur(14px) saturate(160%);
+        border-radius: 70px !important;
+        border-bottom: none !important;
+        padding: 14px 36px !important;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10) !important;
+        overflow: hidden;
+    }
+    .main-header .navbar { background: transparent !important; padding: 0 !important; }
+    .main-header .navbar > .container { max-width: 100% !important; padding: 0 !important; }
+
+    .main-header .navbar-brand {
+        padding: 0;
+        margin: 0 20px 0 10px;
+        flex-shrink: 0 !important;                           /* stops the logo being squashed */
+    }
+    .main-header .navbar-brand img {
+        height: 85px;
+        width: auto !important;
+        max-width: none !important;
+        flex-shrink: 0;
+        object-fit: contain;
+        filter: saturate(1.4) contrast(1.15) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));   /* makes logo stand out */
+    }
+
+    /* ===== NAV TEXT: plain dark text, no glow ===== */
+    .main-header .nav-link {
+        color: #111111 !important;
+        font-weight: 600;
+        padding: 10px 12px !important;
+        white-space: nowrap;
+        position: relative;
+        text-shadow: none;
+        transition: color .25s ease;
+    }
+    .main-header .nav-link:hover,
+    .main-header .nav-link.active { color: #a97a14 !important; }   /* slightly deeper gold = better contrast on light bg */
+
+    .main-header .btn-default { white-space: nowrap; }
+
+    /* Book Now button inside the mobile bar (hidden on desktop) */
+    .main-header .mobile-book-btn { display: none; }
+
+    @media (max-width: 991px) {
+        .main-header {
+            top: 12px;
+            width: calc(100% - 24px) !important;
+        }
+        .main-header .header-sticky,
+        .main-header .header-sticky.hide,
+        .main-header .header-sticky.active {
+            border-radius: 32px !important;
+            padding: 10px 20px !important;
+            overflow: visible;                        /* lets the mobile dropdown show below the bar */
+           background-size: cover !important;
+background-position: center 70% !important;
+        }
+        .main-header .navbar-brand { margin-left: 15px; }
+        .main-header .navbar-brand img { height: 60px; }
+
+        /* Book Now sits in the bar, just left of the menu button */
+        .main-header .mobile-book-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            right: 66px;                              /* distance from the menu (hamburger) button: lower = further right */
+            top: 50%;
+            transform: translateY(-50%);
+            background: #265648;
+            color: #ffffff !important;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            white-space: nowrap;
+            padding: 12px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(38, 86, 72, 0.30);
+            transition: background .25s ease;
+        }
+        .main-header .mobile-book-btn:hover { background: #c9972b; }
+
+        /* the same button now lives in the bar, so hide the copy inside the dropdown */
+        .main-header .slicknav_nav li.highlighted-menu { display: none !important; }
+
+        /* Mobile dropdown menu: white, rounded, with the same pattern */
+        .main-header .slicknav_menu {
+            background: transparent !important;
+            padding: 0 !important;
+        }
+        .main-header .slicknav_nav {
+            background-color: rgba(255, 255, 255, 0.85) !important;
+            background-image: url("{% static 'malabar-static/nav4.png' %}") !important;
+            background-repeat: no-repeat !important;
+            background-size: cover !important;
+            background-position: center !important;
+            border-radius: 28px !important;
+            margin-top: 8px !important;
+            padding: 10px 8px 16px !important;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.10);
+        }
+        .main-header .slicknav_nav a {
+            background: transparent !important;
+            color: #111111 !important;
+            font-weight: 600;
+            text-shadow: none;
+        }
+        .main-header .slicknav_nav a:hover,
+        .main-header .slicknav_nav a.active {
+            color: #a97a14 !important;
+        }
+
+        /* Mobile "Book Now" as a button */
+        .main-header .slicknav_nav li.highlighted-menu {
+            padding: 8px 8px 0;
+        }
+        .main-header .slicknav_nav li.highlighted-menu a,
+        .main-header .slicknav_nav a.open-booking {
+            display: block !important;
+            width: 100%;
+            text-align: center !important;
+            background: #265648 !important;          /* same green as the desktop Book Now button */
+            color: #ffffff !important;
+            font-weight: 600;
+            text-shadow: none;
+            border-radius: 50px !important;
+            padding: 14px 20px !important;
+            margin: 0 !important;
+            box-shadow: 0 6px 16px rgba(38, 86, 72, 0.30);
+            transition: background .25s ease;
+        }
+        .main-header .slicknav_nav li.highlighted-menu a:hover,
+        .main-header .slicknav_nav a.open-booking:hover {
+            background: #c9972b !important;
+            color: #ffffff !important;
+        }
+        /* remove the template's decorative circles on that link */
+        .main-header .slicknav_nav li.highlighted-menu a::before,
+        .main-header .slicknav_nav li.highlighted-menu a::after,
+        .main-header .slicknav_nav li.highlighted-menu::before,
+        .main-header .slicknav_nav li.highlighted-menu::after {
+            display: none !important;
+        }
+    }
+
+    @media (max-width: 380px) {
+        .main-header .mobile-book-btn { right: 58px; padding: 10px 14px; font-size: 13px; }
+    }
+
+    /* ---------- Booking modal ---------- */
+    .bk-overlay {
+        position: fixed; inset: 0; z-index: 2000;
+        background: rgba(0,0,0,.6);
+        display: none; align-items: center; justify-content: center;
+        padding: 16px; overflow-y: auto;
+    }
+    .bk-overlay.open { display: flex; }
+    .bk-box {
+        background: #fff; width: 100%; max-width: 560px;
+        border-radius: 24px; padding: 32px; position: relative;
+        max-height: 92vh; overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+    .bk-close {
+        position: absolute; top: 14px; right: 18px;
+        background: none; border: 0; font-size: 28px; line-height: 1; cursor: pointer; color: #111;
+    }
+    .bk-box h3 { margin: 0 0 6px; }
+    .bk-box p.bk-sub { margin: 0 0 20px; color: #666; font-size: 14px; }
+    .bk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .bk-grid .full { grid-column: 1 / -1; }
+    .bk-box label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 4px; }
+    .bk-box input, .bk-box textarea, .bk-box select {
+        width: 100%; border: 1px solid #ddd; border-radius: 12px;
+        padding: 10px 14px; font-size: 15px; font-family: inherit; background: #fff;
+    }
+    .bk-box select { cursor: pointer; }
+    .bk-box input:focus, .bk-box textarea:focus, .bk-box select:focus { outline: none; border-color: #c9972b; }
+    .bk-submit {
+        width: 100%; margin-top: 20px; border: 0; border-radius: 50px;
+        padding: 14px 20px; font-weight: 600; font-size: 16px; cursor: pointer;
+        color: #fff; background: #111;
+    }
+    .bk-submit:hover { background: #c9972b; }
+    .bk-submit:disabled { opacity: .6; cursor: wait; }
+    .bk-note { margin: 10px 0 0; font-size: 12px; color: #888; text-align: center; }
+    .bk-status { margin-top: 14px; font-size: 14px; display: none; }
+    .bk-status.ok { display: block; color: #1a7f37; }
+    .bk-status.err { display: block; color: #c62828; }
+    @media (max-width: 575px) {
+        .bk-box { padding: 24px 18px; }
+        .bk-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---------- Success modal ---------- */
+    .bk-success-box {
+        background: #fff; width: 100%; max-width: 420px;
+        border-radius: 24px; padding: 40px 32px 32px; text-align: center;
+        box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        animation: bkPop .3s ease;
+    }
+    @keyframes bkPop {
+        from { transform: scale(.9); opacity: 0; }
+        to   { transform: scale(1);  opacity: 1; }
+    }
+    .bk-success-icon {
+        width: 76px; height: 76px; margin: 0 auto 20px;
+        border-radius: 50%; background: #e6f6ec; color: #1a7f37;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 34px;
+    }
+    .bk-success-box h3 { margin: 0 0 10px; }
+    .bk-success-box p { margin: 0; color: #666; font-size: 15px; line-height: 1.6; }
+    .bk-success-btn {
+        margin-top: 24px; border: 0; border-radius: 50px;
+        padding: 12px 40px; font-weight: 600; cursor: pointer;
+        color: #fff; background: #111;
+    }
+    .bk-success-btn:hover { background: #c9972b; }
+
+        /* ---------- Navbar on small laptops / large tablets (992px to 1199px) ---------- */
+    @media (min-width: 992px) and (max-width: 1199px) {
+        .main-header {
+            top: 20px;
+            width: calc(100% - 32px) !important;
+        }
+        .main-header .header-sticky,
+        .main-header .header-sticky.hide,
+        .main-header .header-sticky.active {
+            padding: 8px 20px !important;
+            border-radius: 50px !important;
+            background-size: cover !important;
+        }
+
+        .main-header .navbar > .container { flex-wrap: nowrap; }
+
+        /* smaller logo */
+        .main-header .navbar-brand { margin: 0 6px 0 0; }
+        .main-header .navbar-brand img { height: 58px; }
+
+        /* menu takes the free space, links never wrap or overflow */
+        .main-header .main-menu {
+            flex-grow: 1;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 0;
+        }
+        .main-header .nav-menu-wrapper {
+            flex: 1;
+            min-width: 0;
+            text-align: center;
+        }
+        .main-header .navbar-nav {
+            flex-wrap: nowrap;
+            justify-content: center;
+        }
+        .main-header .nav-link {
+            padding: 8px 7px !important;
+            font-size: 14px;
+        }
+
+        /* compact Book Now button */
+        .main-header .header-btn {
+            flex-shrink: 0;
+            margin-left: 6px;
+        }
+        .main-header .header-btn .btn-default {
+            font-size: 14px;
+            padding-top: 12px;
+            padding-bottom: 12px;
+            padding-left: 16px;
+        }
+    }
+
+    /* ---------- Preloader logo size ---------- */
+    .preloader #loading-icon { max-width: none !important; }
+    .preloader #loading-icon img {
+        width: 80px !important;      /* change this to make the preloader logo bigger / smaller */
+        max-width: none !important;
+        height: auto !important;
+    }
+
+    /* ---------- Footer background image (foot.png) ---------- */
+    .footer-main {
+        /* IMAGE FADE: change both 0.55 values together (higher = image fainter + text clearer) */
+        background-image: linear-gradient(rgba(8, 28, 26, 0.55), rgba(8, 28, 26, 0.55)), url("{% static 'malabar-static/foot.png' %}") !important;
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        background-position: center !important;
+    }
+
+    /* footer text: crisp and readable over the image */
+    .footer-main,
+    .footer-main h3,
+    .footer-main p,
+    .footer-main a,
+    .footer-main span,
+    .footer-main li {
+        color: #ffffff;
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+    }
+    .footer-main a:hover { color: #e0b14a; }
+    .footer-main .footer-contact-content p,
+    .footer-main .footer-contact-info-item p,
+    .footer-main .about-footer-content p { opacity: 0.95; }
+    .footer-main .footer-social-links a,
+    .footer-main .footer-social-links i { text-shadow: none; }
+
+    /* remove the theme's old footer decorations (flowers / leaves / overlays) so only foot.png shows */
+    .footer-main::before,
+    .footer-main::after,
+    .footer-main .container::before,
+    .footer-main .container::after,
+    .footer-main .row::before,
+    .footer-main .row::after,
+    .footer-main .about-footer::before,
+    .footer-main .about-footer::after {
+        content: none !important;
+        display: none !important;
+        background: none !important;
+    }
+        /* ================= MOBILE: ALL TEXT ALIGNED TO THE LEFT (whole website) ================= */
+    @media (max-width: 991px) {
+
+        /* ---- hero (all pages) ---- */
+        .page-header-box,
+        .page-header-box h1,
+        .page-header .breadcrumb {
+            text-align: left !important;
+            justify-content: flex-start !important;
+        }
+
+        /* ---- theme section headings + descriptions (home, about, contact...) ---- */
+        .section-title,
+        .section-title-center,
+        .section-title *,
+        .section-row .section-title * {
+            text-align: left !important;
+        }
+        .section-title,
+        .section-title-center {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+        .section-title p {
+            margin-left: 0 !important;
+            margin-right: auto !important;
+        }
+
+        /* ---- Packages / Experiences / Destinations / Contact page headings ---- */
+        .pk-head, .pk-head *,
+        .act-head, .act-head *,
+        .dest-head, .dest-head * {
+            text-align: left !important;
+        }
+        .pk-head, .act-head, .dest-head {
+            margin-left: 0 !important;
+            margin-right: auto !important;
+        }
+
+        /* ---- Terms & Conditions heading ---- */
+        .tc-title-row { justify-content: flex-start !important; }
+        .tc-title-row .tc-line { display: none !important; }
+
+        /* ---- Testimonials intro ---- */
+        .pc-intro, .pc-intro * { text-align: left !important; }
+        .pc-eyebrow { justify-content: flex-start !important; }
+        .pc-sub, .pc-swirl { margin-left: 0 !important; margin-right: auto !important; }
+
+        /* ---- FAQ intro ---- */
+        .fq-left, .fq-left * { text-align: left !important; }
+
+        /* ---- Our Story ---- */
+        .about-us-content, .about-us-content * { text-align: left !important; }
+
+        /* ---- Footer ---- */
+        .footer-main,
+        .footer-main .about-footer,
+        .footer-main .about-footer-content,
+        .footer-main .footer-links,
+        .footer-main .footer-links h3,
+        .footer-main .footer-links ul,
+        .footer-main .footer-contact-item,
+        .footer-main .footer-contact-content,
+        .footer-main .footer-contact-info-item,
+        .footer-main .footer-copyright,
+        .footer-main .footer-copyright-text,
+        .footer-main .footer-social-links,
+        .footer-main .footer-logo {
+            text-align: left !important;
+        }
+        .footer-main .footer-contact-item,
+        .footer-main .footer-copyright,
+        .footer-main .footer-social-links {
+            justify-content: flex-start !important;
+            align-items: flex-start !important;
+        }
+        .footer-main .footer-copyright { flex-direction: column; gap: 16px; }
+        .footer-main .footer-social-links ul { justify-content: flex-start !important; padding-left: 0; }
+    }
+
+    
+</style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Preloader -->
+    <div class="preloader">
+        <div class="loading-container">
+            <div class="loading"></div>
+            <div id="loading-icon"><img src="{% static 'malabar-static/logo.webp' %}" alt=""></div>
+        </div>
+    </div>
+
+    
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-sticky">
+            <nav class="navbar navbar-expand-lg">
+                <div class="container">
+                    <a class="navbar-brand" href="{% url 'home' %}">
+                        <img src="{% static 'malabar-static/logo.webp' %}" alt="Malabaroutes">
+                    </a>
+
+                    <div class="collapse navbar-collapse main-menu">
+                        <div class="nav-menu-wrapper">
+                            <ul class="navbar-nav mr-auto" id="menu">
+                                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About Us</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'packages' %}">Packages</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'activities' %}">Experiences</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{% url 'destinations' %}">Destinations</a></li>
+
+                                <li class="nav-item"><a class="nav-link" href="{% url 'gallery' %}">Gallery</a></li>
+                               
+                                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact Us</a></li>
+                                <li class="nav-item highlighted-menu"><a class="nav-link open-booking" href="#">Book Now</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="header-btn">
+                            <a href="#" class="btn-default open-booking">Book Now</a>
+                        </div>
+                    </div>
+                    <a href="#" class="mobile-book-btn open-booking">Book Now</a>
+                    <div class="navbar-toggle"></div>
+                </div>
+            </nav>
+            <div class="responsive-menu"></div>
+        </div>
+    </header>
+
+    <!-- Page content -->
+    {% block content %}{% endblock %}
+
+    <!-- Booking Modal -->
+    <div class="bk-overlay" id="bookingModal" aria-hidden="true">
+        <div class="bk-box" role="dialog" aria-modal="true" aria-labelledby="bkTitle">
+            <button type="button" class="bk-close" data-booking-close aria-label="Close">&times;</button>
+            <h3 id="bkTitle">Plan Your Trip</h3>
+            <p class="bk-sub">Tell us a few details and we'll get back to you shortly.</p>
+
+            <form id="bookingForm" novalidate>
+                {% csrf_token %}
+                <div class="bk-grid">
+                    <div>
+                        <label for="bkName">Full name *</label>
+                        <input type="text" id="bkName" name="name" required>
+                    </div>
+                    <div>
+                        <label for="bkPhone">Phone *</label>
+                        <input type="tel" id="bkPhone" name="phone" required>
+                    </div>
+                    <div>
+                        <label for="bkEmail">Email</label>
+                        <input type="email" id="bkEmail" name="email">
+                    </div>
+                    <div>
+                        <label for="bkGuests">Guests</label>
+                        <input type="number" id="bkGuests" name="guests" min="1" value="2">
+                    </div>
+                    <div class="full">
+                        <label for="bkPackage">Package / Interest</label>
+                        <select id="bkPackage" name="package">
+                            <option value="">Select a package</option>
+                            {% for p in booking_packages %}
+                            <option value="{{ p }}">{{ p }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="bkStart">Start date *</label>
+                        <input type="date" id="bkStart" name="start_date" required>
+                    </div>
+                    <div>
+                        <label for="bkEnd">End date *</label>
+                        <input type="date" id="bkEnd" name="end_date" required>
+                    </div>
+                    <div class="full">
+                        <label for="bkMessage">Message</label>
+                        <textarea id="bkMessage" name="message" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <button type="button" class="bk-submit" id="bkSubmit">
+                    <i class="fa-brands fa-whatsapp"></i> Send Enquiry
+                </button>
+                <p class="bk-note">Your enquiry is sent by email and WhatsApp opens so you can chat with us directly.</p>
+                <div class="bk-status" id="bkStatus"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="bk-overlay" id="bookingSuccess" aria-hidden="true">
+        <div class="bk-success-box" role="dialog" aria-modal="true" aria-labelledby="bkSuccessTitle">
+            <div class="bk-success-icon"><i class="fa-solid fa-check"></i></div>
+            <h3 id="bkSuccessTitle">Enquiry Sent!</h3>
+            <p>Thank you for choosing us. We've received your enquiry by email. Press send in WhatsApp to chat with us directly.</p>
+            <button type="button" class="bk-success-btn" data-success-close>OK</button>
+        </div>
+    </div>
+
+    <!-- Scrolling Ticker -->
+    <div class="our-scrolling-ticker">
+        <div class="scrolling-ticker-box">
+            <div class="scrolling-content">
+                
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-main bg-section dark-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="about-footer">
+                        <div class="footer-logo">
+                            <img src="{% static 'malabar-static/logo.webp' %}" alt="Malabaroutes">
+                        </div>
+                        <div class="about-footer-content">
+                            <p>Handcrafted journeys through Kerala and the Malabar coast.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-5">
+                    <div class="footer-links">
+                        <h3>contact us</h3>
+                        <div class="footer-contact-item">
+                            <div class="icon-box"><img src="{% static 'malabar-static/images/icon-phone.svg' %}" alt=""></div>
+                            <div class="footer-contact-content">
+                                <h3>For more information</h3>
+                                <p><a href="tel:+919446062666">+91 94460 62666</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-4">
+                    <div class="footer-links">
+                        <h3>get in touch</h3>
+                        <div class="footer-contact-info-item">
+                            <h3>Location</h3>
+                            <p>Malabar Routes</p>
+                        </div>
+                        <div class="footer-contact-info-item">
+                            <h3>Email</h3>
+                            <p><a href="mailto:info@malabaroutes.com">info@malabaroutes.com</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-3">
+                    <div class="footer-links">
+                        <h3>quick link</h3>
+                        <ul>
+                            <li><a href="{% url 'home' %}">Home</a></li>
+                            <li><a href="{% url 'about' %}">About us</a></li>
+                            <li><a href="{% url 'activities' %}">our services</a></li>
+                            <li><a href="{% url 'packages' %}">Packages</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-lg-12">
+                    <div class="footer-copyright">
+                        <div class="footer-copyright-text">
+                            <p>Copyright © {% now "Y" %} Malabar Routes. All Rights Reserved.</p>
+                        </div>
+                        <div class="footer-social-links">
+                            <span>Follow us on social</span>
+                            <ul>
+                                <li><a href="#"><i class="fa-brands fa-facebook-f"></i></a></li>
+                                <li><a href="#"><i class="fa-brands fa-instagram"></i></a></li>
+                                <li><a href="https://wa.me/919633870962" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts (order matters) -->
+    <script src="{% static 'malabar-static/js/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/validator.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/jquery.slicknav.js' %}"></script>
+    <script src="{% static 'malabar-static/js/swiper-bundle.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/jquery.waypoints.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/jquery.counterup.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/jquery.magnific-popup.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/SmoothScroll.js' %}"></script>
+    <script src="{% static 'malabar-static/js/parallaxie.js' %}"></script>
+    <script src="{% static 'malabar-static/js/jquery.event.move.js' %}"></script>
+    <script src="{% static 'malabar-static/js/jquery.twentytwenty.js' %}"></script>
+    <script src="{% static 'malabar-static/js/gsap.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/magiccursor.js' %}"></script>
+    <script src="{% static 'malabar-static/js/SplitText.js' %}"></script>
+    <script src="{% static 'malabar-static/js/ScrollTrigger.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/jquery.mb.YTPlayer.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/wow.min.js' %}"></script>
+    <script src="{% static 'malabar-static/js/function.js' %}"></script>
+<script>
+    (function () {
+        var header = document.querySelector('.main-header');
+        if (!header) return;
+        var path = window.location.pathname.replace(/\/+$/, '') || '/';
+        header.querySelectorAll('.nav-link').forEach(function (a) {
+            var href = a.getAttribute('href');
+            if (!href || href === '#') return;
+            var p = href.replace(/\/+$/, '') || '/';
+            if (path === p || (p !== '/' && path.indexOf(p + '/') === 0)) {
+                a.classList.add('active');
+            }
+        });
+    })();
+</script>
+
+<!-- Booking modal logic -->
+<script>
+    (function () {
+        var WA_NUMBER = "919633870962"; // <-- your WhatsApp number: country code + number, no + or spaces
+        var EMAIL_URL = "{% url 'booking_email' %}";
+
+        var modal = document.getElementById('bookingModal');
+        var successModal = document.getElementById('bookingSuccess');
+        var form = document.getElementById('bookingForm');
+        var statusEl = document.getElementById('bkStatus');
+        var submitBtn = document.getElementById('bkSubmit');
+        var pkgSelect = document.getElementById('bkPackage');
+        var startInput = document.getElementById('bkStart');
+        var endInput = document.getElementById('bkEnd');
+        if (!modal || !form) return;
+
+        // Block past dates; end date can't be before start date
+        var today = new Date().toISOString().split('T')[0];
+        startInput.min = today;
+        endInput.min = today;
+        startInput.addEventListener('change', function () {
+            endInput.min = startInput.value || today;
+            if (endInput.value && endInput.value < endInput.min) endInput.value = '';
+        });
+
+        function setStatus(msg, type) {
+            statusEl.textContent = msg || '';
+            statusEl.className = 'bk-status' + (type ? ' ' + type : '');
+        }
+
+        // Pre-select a package (adds it to the dropdown if it isn't listed)
+        function setPackage(name) {
+            var found = false;
+            for (var i = 0; i < pkgSelect.options.length; i++) {
+                if (pkgSelect.options[i].value === name) { found = true; break; }
+            }
+            if (!found) {
+                var opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                pkgSelect.insertBefore(opt, pkgSelect.options[1] || null);
+            }
+            pkgSelect.value = name;
+        }
+
+        function openModal(pkg) {
+            if (pkg) setPackage(pkg);
+            setStatus('');
+            modal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            modal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+        function showSuccess() {
+            modal.classList.remove('open');
+            if (successModal) successModal.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSuccess() {
+            if (successModal) successModal.classList.remove('open');
+            document.body.style.overflow = '';
+        }
+
+        // Delegated, so it also works for the cloned mobile (SlickNav) menu
+        document.addEventListener('click', function (e) {
+            var opener = e.target.closest('.open-booking');
+            if (opener) {
+                e.preventDefault();
+                openModal(opener.getAttribute('data-package') || '');
+                return;
+            }
+            if (e.target.closest('[data-booking-close]') || e.target === modal) closeModal();
+            if (e.target.closest('[data-success-close]') || e.target === successModal) closeSuccess();
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') { closeModal(); closeSuccess(); }
+        });
+
+        function val(name) { return form.elements[name].value.trim(); }
+
+        function validate() {
+            if (!val('name') || !val('phone')) {
+                setStatus('Please enter your name and phone number.', 'err');
+                return false;
+            }
+            if (!val('start_date') || !val('end_date')) {
+                setStatus('Please select your start and end dates.', 'err');
+                return false;
+            }
+            if (val('end_date') < val('start_date')) {
+                setStatus('End date cannot be before the start date.', 'err');
+                return false;
+            }
+            return true;
+        }
+
+        // ONE button: saves + emails the enquiry, and opens WhatsApp
+        submitBtn.addEventListener('click', function () {
+            if (!validate()) return;
+
+            var lines = [
+                'Hello, I would like to book a trip.',
+                '',
+                'Name: ' + val('name'),
+                'Phone: ' + val('phone')
+            ];
+            if (val('email'))   lines.push('Email: ' + val('email'));
+            if (val('package')) lines.push('Package: ' + val('package'));
+            lines.push('Start date: ' + val('start_date'));
+            lines.push('End date: ' + val('end_date'));
+            if (val('guests'))  lines.push('Guests: ' + val('guests'));
+            if (val('message')) lines.push('Message: ' + val('message'));
+
+            // Open WhatsApp right away (inside the click, so browsers don't block it)
+            var waUrl = 'https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n'));
+            window.open(waUrl, '_blank', 'noopener');
+
+            // Save + email through Django
+            submitBtn.disabled = true;
+            setStatus('Sending your enquiry...', '');
+
+            var fd = new FormData(form);
+            fd.append('channel', 'whatsapp + email');
+
+            fetch(EMAIL_URL, {
+                method: 'POST',
+                body: fd,
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+            .then(function (res) {
+                if (res.ok && res.d.ok) {
+                    setStatus('');
+                    form.reset();
+                    showSuccess();
+                } else {
+                    setStatus(res.d.error || 'We could not email your enquiry, but WhatsApp has opened.', 'err');
+                }
+            })
+            .catch(function () {
+                setStatus('Network error. Please continue on WhatsApp.', 'err');
+            })
+            .finally(function () { submitBtn.disabled = false; });
+        });
+    })();
+</script>
+<script>
+(function () {
+    var today = new Date().toISOString().split('T')[0];
+
+    document.querySelectorAll('input[name="name"], input[name="first_name"], input[name="last_name"]').forEach(function (el) {
+        el.setAttribute('maxlength', '60');
+        el.setAttribute('autocomplete', 'name');
+        el.addEventListener('input', function () {
+            /* remove digits and symbols while typing */
+            el.value = el.value.replace(/[^\p{L}\s.'’\-]/gu, '');
+        });
+    });
+
+    document.querySelectorAll('input[name="phone"]').forEach(function (el) {
+        el.setAttribute('type', 'tel');
+        el.setAttribute('inputmode', 'tel');
+        el.setAttribute('maxlength', '16');
+        el.addEventListener('input', function () {
+            /* digits only, one optional + at the start */
+            var v = el.value.replace(/[^\d+]/g, '');
+            v = (v.charAt(0) === '+' ? '+' : '') + v.replace(/\+/g, '');
+            el.value = v;
+        });
+    });
+
+    document.querySelectorAll('input[name="guests"]').forEach(function (el) {
+        el.setAttribute('min', '1');
+        el.setAttribute('max', '100');
+        el.addEventListener('input', function () { el.value = el.value.replace(/\D/g, ''); });
+    });
+
+    document.querySelectorAll('input[name="start_date"], input[name="end_date"]').forEach(function (el) {
+        el.setAttribute('min', today);
+    });
+    document.querySelectorAll('input[name="start_date"]').forEach(function (s) {
+        s.addEventListener('change', function () {
+            var e = s.form && s.form.querySelector('input[name="end_date"]');
+            if (e) { e.min = s.value || today; if (e.value && e.value < e.min) e.value = ''; }
+        });
+    });
+})();
+</script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,67 @@
+{% extends "admin_pages/base.html" %}
+
+{% block title %}{{ activity.title }} | Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <div class="card-header flex-wrap gap-2">
+        <h3 class="card-title mb-0">{{ activity.title }}</h3>
+        <div class="d-flex gap-2">
+            <a href="{% url 'admin_activity_list' %}" class="btn btn-outline-secondary">Back</a>
+            <a href="{% url 'activity_update' activity.slug %}" class="btn btn-primary">Edit</a>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        {% if activity.is_active %}
+            <span class="badge bg-success">Active</span>
+        {% else %}
+            <span class="badge bg-secondary">Hidden</span>
+        {% endif %}
+        <span class="text-muted small ms-2">
+            Order: {{ activity.order }} &middot;
+            Created {{ activity.created_at|date:"d M Y, H:i" }} &middot;
+            Updated {{ activity.updated_at|date:"d M Y, H:i" }}
+        </span>
+    </div>
+
+    {% if activity.image %}
+        <img src="{{ activity.image.url }}" alt="{{ activity.title }}"
+             class="mb-4" style="max-width:100%;max-height:320px;border-radius:10px;">
+    {% endif %}
+
+    <div class="activity-description">
+        {{ activity.description|safe }}
+    </div>
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" action="{% url 'activity_delete' activity.slug %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Experience</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong>{{ activity.title }}</strong>? This cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .activity-description ul { list-style: disc; padding-left: 1.5rem; }
+    .activity-description ol { list-style: decimal; padding-left: 1.5rem; }
+</style>
+{% endblock %}

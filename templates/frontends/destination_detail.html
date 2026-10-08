@@ -1,0 +1,325 @@
+{% extends "frontends/base.html" %}
+{% load static %}
+
+{% block title %}{{ destination.name }} | Malabar{% endblock %}
+
+{% comment %}
+    Fonts are NOT set on this page: they come from base.html.
+    Colours come from base.html (--accent-color, --primary-color).
+    Hero = same design as the About page (inset, rounded), using the destination image.
+    Book Now buttons open the booking modal from base.html (.open-booking + data-package).
+    Sidebar "More Destinations" shows full names (wrapped, bold), nothing is cut.
+    Main image shows in full (no cropping).
+{% endcomment %}
+
+{% block extra_css %}
+<style>
+    /* ================= HERO (same design as About page, destination image) ================= */
+    .page-header.page-hero {
+        width: calc(100% - 32px) !important;
+        max-width: calc(100% - 32px) !important;
+        margin: 16px 16px 0 !important;
+        border-radius: 40px !important;
+        overflow: hidden !important;
+        min-height: calc(75vh - 16px);
+        display: flex;
+        align-items: center;
+        padding: 200px 0 110px !important;
+        background-color: #222 !important;
+        background-image:
+            linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)),
+            url('{% if destination.image %}{{ destination.image.url }}{% else %}{% static "malabar-static/mr5.webp" %}{% endif %}') !important;
+        background-size: cover, cover !important;
+        background-position: center, center !important;
+        background-repeat: no-repeat, no-repeat !important;
+    }
+    .page-header.page-hero::before,
+    .page-header.page-hero::after { display: none !important; }
+
+    .page-hero .page-header-box { text-align: center; }
+    .page-hero h1 {
+        font-weight: 700 !important; font-size: 58px;
+        line-height: 1.2; letter-spacing: 4px; color: #f7e3d2 !important; text-transform: none !important;
+        text-shadow: 0 2px 12px rgba(0,0,0,.5); margin: 0 auto 20px; max-width: 1000px;
+    }
+    .page-hero .breadcrumb { justify-content: center; margin: 0; }
+    .page-hero .breadcrumb-item, .page-hero .breadcrumb-item a,
+    .page-hero .breadcrumb-item + .breadcrumb-item::before { color: #f7e3d2 !important; text-transform: capitalize; }
+
+    @media (max-width: 991px) {
+        .page-header.page-hero {
+            width: calc(100% - 20px) !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px 10px 0 !important;
+            border-radius: 24px !important;
+            min-height: 55vh;
+            padding: 150px 0 70px !important;
+        }
+        .page-hero h1 { font-size: 36px; letter-spacing: 2px; }
+    }
+    @media (max-width: 575px) {
+        .page-hero h1 { font-size: 28px; letter-spacing: 1px; }
+    }
+
+    /* ================= SECTION (bg5.png background) ================= */
+    .ad-section {
+        --ad-accent: var(--accent-color, #265648);
+        --ad-dark: var(--primary-color, #1a1a1a);
+
+        padding: 120px 0 130px;
+        background-color: #f2fdff;
+        background-image:
+            linear-gradient(rgba(242, 253, 255, 0.35), rgba(242, 253, 255, 0.35)),
+            url('{% static "malabar-static/bg5.png" %}');
+        background-size: 100% 100%, 100% auto;
+        background-position: center, center top;
+        background-repeat: no-repeat, repeat-y;
+    }
+    .ad-section .container { max-width: 1320px; }
+
+    /* ================= MAIN COLUMN (no white cards) ================= */
+    .ad-stack { display: flex; flex-direction: column; gap: 34px; }
+
+    .ad-title {
+        font-size: 46px; font-weight: 700;
+        line-height: 1.2; color: #1b1b1b; margin: 0; padding: 0; text-transform: none;
+    }
+    .ad-title::before, .ad-title::after,
+    .ad-label::before, .ad-label::after,
+    .ad-box h3::before, .ad-box h3::after { display: none !important; content: none !important; }
+
+    .ad-facts { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
+    .ad-fact {
+        display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,.6);
+        border: 1px solid rgba(0,0,0,.07); border-radius: 14px; padding: 12px 20px;
+    }
+    .ad-fact i { font-size: 19px; color: var(--ad-accent); }
+    .ad-fact small { display: block; font-size: 11.5px; color: #6b625a; text-transform: uppercase; letter-spacing: .8px; }
+    .ad-fact strong { font-size: 15.5px; color: #1b1b1b; font-weight: 600; }
+
+    /* 2. Image: shown in full, nothing cropped */
+    .ad-image {
+        width: 100%;
+        height: auto;
+        border-radius: 16px;
+        overflow: hidden;
+        line-height: 0;
+    }
+    .ad-image figure,
+    .ad-image figure.reveal {
+        width: 100% !important;
+        height: auto !important;
+        aspect-ratio: auto !important;   /* cancels the theme's fixed ratio */
+        margin: 0 !important;
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    .ad-image img {
+        width: 100% !important;
+        height: auto !important;          /* natural height */
+        max-height: none !important;      /* no height limit */
+        aspect-ratio: auto !important;
+        object-fit: contain !important;   /* never crop */
+        display: block;
+        border-radius: 16px;
+    }
+
+    /* 3. Description */
+    .ad-label {
+        font-size: 28px; font-weight: 500;
+        color: #1b1b1b; margin: 0 0 16px; padding: 0; text-transform: none;
+    }
+    .ad-desc, .ad-desc p { font-size: 16.5px; line-height: 1.85; color: #5a524a; }
+    .ad-desc p { margin-bottom: 16px; }
+    .ad-desc p:last-child { margin-bottom: 0; }
+    .ad-desc ul { padding-left: 20px; }
+    .ad-desc li { margin-bottom: 8px; color: #5a524a; line-height: 1.7; }
+
+    /* 4. Booking row */
+    .ad-book { display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+    .ad-book p { margin: 0; font-size: 26px; color: #1b1b1b; }
+
+    .ad-btn {
+        display: inline-flex; align-items: center; gap: 10px; white-space: nowrap;
+        background: var(--ad-accent); border: 1.5px solid var(--ad-accent);
+        color: #fff !important; font-size: 15.5px; font-weight: 600;
+        padding: 15px 32px; border-radius: 40px; text-decoration: none;
+        transition: all .3s ease;
+    }
+    .ad-btn:hover { filter: brightness(0.88); color: #fff !important; }
+    .ad-btn i { font-size: 13px; transition: transform .3s ease; }
+    .ad-btn:hover i { transform: translateX(4px); }
+
+    .ad-btn-light { background: #fff; border-color: #fff; color: var(--ad-accent) !important; width: 100%; justify-content: center; }
+    .ad-btn-light:hover { filter: none; background: var(--ad-dark); border-color: var(--ad-dark); color: #fff !important; }
+
+    /* ================= SIDEBAR ================= */
+    .ad-sidebar { position: sticky; top: 130px; display: flex; flex-direction: column; gap: 28px; }
+    .ad-box { background: #fff; border-radius: 16px; padding: 30px; box-shadow: 0 8px 28px rgba(0,0,0,.07); }
+    .ad-box h3 {
+        font-size: 26px; font-weight: 500;
+        color: #1b1b1b; margin: 0 0 18px; padding: 0; text-transform: none;
+    }
+
+    .ad-list { list-style: none; margin: 0; padding: 0; }
+    .ad-list li { border-bottom: 1px solid rgba(0,0,0,.08); }
+    .ad-list li:last-child { border-bottom: none; }
+    .ad-list a {
+        display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+        padding: 14px 0; color: #1b1b1b;
+        font-size: 15.5px; font-weight: 700; line-height: 1.45;
+        text-decoration: none;
+        transition: color .25s ease, padding .25s ease;
+    }
+    .ad-list a .ad-list-name { flex: 1; min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+    .ad-list a i { flex: 0 0 auto; margin-top: 5px; font-size: 12px; color: var(--ad-accent); }
+    .ad-list a:hover { color: var(--ad-accent); padding-left: 6px; }
+
+    .ad-cta { background: var(--ad-accent); color: #fff; }
+    .ad-cta .ad-cta-icon {
+        width: 64px; height: 64px; border-radius: 18px; background: rgba(255,255,255,.12);
+        display: flex; align-items: center; justify-content: center; font-size: 26px; margin-bottom: 18px;
+    }
+    .ad-cta h3 { color: #fff; margin-bottom: 20px; }
+    .ad-cta .ad-call { display: flex; align-items: center; gap: 14px; margin-top: 22px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.2); }
+    .ad-cta .ad-call i { font-size: 20px; }
+    .ad-cta .ad-call small { display: block; font-size: 12.5px; opacity: .8; text-transform: uppercase; letter-spacing: 1px; }
+    .ad-cta .ad-call a { color: #fff; font-size: 18px; font-weight: 600; text-decoration: none; }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 1199px) {
+        .ad-title { font-size: 38px; }
+    }
+    @media (max-width: 991px) {
+        .ad-section { padding: 90px 0 80px; }
+        .ad-sidebar { position: static; margin-top: 10px; }
+    }
+    @media (max-width: 575px) {
+        .ad-title { font-size: 30px; }
+        .ad-label, .ad-book p { font-size: 22px; }
+        .ad-fact { width: 100%; }
+        .ad-book { flex-direction: column; align-items: flex-start; }
+        .ad-box { padding: 24px 20px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero (destination image + title, same design as About page) -->
+<div class="page-header page-hero">
+    <div class="container"><div class="row"><div class="col-lg-12">
+        <div class="page-header-box">
+            <h1 class="text-anime-style-3" data-cursor="-opaque">{{ destination.name }}</h1>
+            <nav class="wow fadeInUp" data-wow-delay="0.3s"><ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'home' %}">home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'destinations' %}">destinations</a></li>
+                <li class="breadcrumb-item active" aria-current="page">details</li>
+            </ol></nav>
+        </div>
+    </div></div></div>
+</div>
+
+<!-- Destination details -->
+<section class="ad-section">
+    <div class="container">
+        <div class="row g-4 g-xl-5">
+
+            <!-- Main column -->
+            <div class="col-lg-8 order-lg-2">
+                <div class="ad-stack">
+
+                    <!-- 1. Title -->
+                    <div class="wow fadeInUp">
+
+                        <h1 class="ad-title">{{ destination.name }}</h1>
+
+                        {% if destination.location or destination.best_time or destination.duration %}
+                        <div class="ad-facts">
+                            {% if destination.location %}
+                            <div class="ad-fact">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <div><small>Location</small><strong>{{ destination.location }}</strong></div>
+                            </div>
+                            {% endif %}
+                            {% if destination.best_time %}
+                            <div class="ad-fact">
+                                <i class="fa-regular fa-calendar"></i>
+                                <div><small>Best time to visit</small><strong>{{ destination.best_time }}</strong></div>
+                            </div>
+                            {% endif %}
+                            {% if destination.duration %}
+                            <div class="ad-fact">
+                                <i class="fa-regular fa-clock"></i>
+                                <div><small>Suggested stay</small><strong>{{ destination.duration }}</strong></div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 2. Image (full picture, not cropped) -->
+                    <div class="ad-image">
+                        <figure class="image-anime reveal">
+                            <img src="{% if destination.image %}{{ destination.image.url }}{% else %}{% static 'malabar-static/mr5.webp' %}{% endif %}" alt="{{ destination.name }}">
+                        </figure>
+                    </div>
+
+                    <!-- 3. Description -->
+                    <div class="wow fadeInUp" data-wow-delay="0.15s">
+                        <h3 class="ad-label">About this destination</h3>
+                        <div class="ad-desc">
+                            {{ destination.description|safe }}
+                        </div>
+                    </div>
+
+                    <!-- 4. Booking -->
+                    <div class="wow fadeInUp" data-wow-delay="0.2s">
+                        <div class="ad-book">
+                            <p>Ready to visit {{ destination.name }}?</p>
+                            <a href="#" class="ad-btn open-booking" data-package="{{ destination.name }}">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4 order-lg-1">
+                <aside class="ad-sidebar">
+
+                    {% if other_destinations %}
+                    <div class="ad-box wow fadeInUp">
+                        <h3>More Destinations</h3>
+                        <ul class="ad-list">
+                            {% for o in other_destinations %}
+                            <li>
+                                <a href="{% url 'destination_detail' o.slug %}">
+                                    <span class="ad-list-name">{{ o.name }}</span>
+                                    <i class="fa-solid fa-arrow-right"></i>
+                                </a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <div class="ad-box ad-cta wow fadeInUp" data-wow-delay="0.2s">
+                        <div class="ad-cta-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+                        <h3>Plan your Malabar trip with us</h3>
+                        <a href="#" class="ad-btn ad-btn-light open-booking" data-package="{{ destination.name }}">Book Now <i class="fa-solid fa-arrow-right"></i></a>
+                        <div class="ad-call">
+                            <i class="fa-solid fa-phone"></i>
+                            <div>
+                                <small>Call us</small>
+                                <a href="tel:+91 9446 0626 66">+91 9446 0626 66</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </aside>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

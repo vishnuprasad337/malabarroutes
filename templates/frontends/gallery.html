@@ -1,0 +1,298 @@
+{% extends "frontends/base.html" %}
+{% load static %}
+
+{% block title %}Gallery | Malabar{% endblock %}
+
+{% comment %}
+    Fonts are NOT set on this page: they come from base.html.
+    Colours come from base.html (--accent-color, --primary-color).
+    Hero = same design as the About page (inset, rounded).
+    Lightbox shows the full photo (no cropping).
+{% endcomment %}
+
+{% block extra_css %}
+<style>
+    /* ================= HERO (same design as About page) ================= */
+    .page-header.gallery-hero {
+        width: calc(100% - 32px) !important;      /* white gap on left and right */
+        max-width: calc(100% - 32px) !important;
+        margin: 16px 16px 0 !important;           /* white gap on top */
+        border-radius: 40px !important;           /* rounded corners */
+        overflow: hidden !important;              /* clips the image to the curve */
+        min-height: calc(80vh - 16px);
+        display: flex;
+        align-items: center;
+        padding: 200px 0 120px !important;
+        background-color: #222 !important;
+        background-image:
+            linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),
+            url('{% static "malabar-static/mr5.webp" %}') !important;
+        background-size: cover, cover !important;
+        background-position: center, center !important;
+        background-repeat: no-repeat, no-repeat !important;
+    }
+    .page-header.gallery-hero::before,
+    .page-header.gallery-hero::after { display: none !important; }
+
+    .page-header.gallery-hero .page-header-box { text-align: center; }
+
+    /* No font-family: inherits the heading font from base */
+    .page-header.gallery-hero h1 {
+        font-size: 80px;
+        letter-spacing: 4px;
+        color: #f7e3d2 !important;
+        text-transform: none !important;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+        margin-bottom: 20px;
+    }
+    .page-header.gallery-hero .breadcrumb { justify-content: center; margin: 0; }
+    .page-header.gallery-hero .breadcrumb-item,
+    .page-header.gallery-hero .breadcrumb-item a,
+    .page-header.gallery-hero .breadcrumb-item + .breadcrumb-item::before {
+        color: #f7e3d2 !important;
+        text-transform: capitalize;
+    }
+
+    /* ================= GALLERY ================= */
+    .gallery-section {
+        /* colours come from base.html */
+        --gal-accent: var(--accent-color, #265648);
+        --gal-dark: var(--primary-color, #111111);
+
+        padding: 90px 0 110px;
+        background-color: #faf8f6;
+        background-image:
+            linear-gradient(rgba(252, 247, 246, 0.45), rgba(252, 247, 246, 0.45)),
+            url('{% static "malabar-static/bg.png" %}');
+        background-size: cover, cover;
+        background-position: center, center;
+        background-repeat: no-repeat, no-repeat;
+    }
+    .gallery-section .container { max-width: 1480px; } /* wider = bigger cards */
+
+    /* ---------- Category pills ---------- */
+    .gallery-filters {
+        display: flex; flex-wrap: wrap; gap: 14px;
+        margin-bottom: 50px; justify-content: center;
+    }
+    .gallery-filter-btn {
+        font-family: inherit;
+        border: 1.5px solid #dcdcdc;
+        background: #fff;
+        color: var(--text-color, #2b2b2b);
+        padding: 12px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all .3s ease;
+    }
+    .gallery-filter-btn:hover {
+        border-color: var(--gal-accent);
+        color: var(--gal-accent);
+    }
+    .gallery-filter-btn.active {
+        background: var(--gal-accent);
+        border-color: var(--gal-accent);
+        color: #fff;
+    }
+
+    /* ---------- 3 per row grid ---------- */
+    .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+    .gallery-item {
+        display: block;
+        position: relative;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+        transition: box-shadow .35s ease, transform .35s ease;
+    }
+    .gallery-item:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16);
+    }
+    .gallery-item.is-hidden { display: none; }
+    .gallery-item.pop-in { animation: galPop .5s ease both; }
+
+    @keyframes galPop {
+        from { opacity: 0; transform: translateY(24px) scale(.96); }
+        to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .gallery-item img {
+        width: 100%;
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        display: block;
+        transition: transform .6s ease;
+    }
+    .gallery-item:hover img { transform: scale(1.08); }
+
+    /* hover overlay with zoom icon (tinted with the base accent colour) */
+    .gallery-item::after {
+        content: "\f00e"; /* Font Awesome magnifier-plus */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute; inset: 0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 30px; color: #fff;
+        background: rgba(0, 0, 0, 0.35);
+        background: color-mix(in srgb, var(--gal-accent) 55%, transparent);
+        opacity: 0; transition: opacity .35s ease;
+    }
+    .gallery-item:hover::after { opacity: 1; }
+
+    .gallery-empty { text-align: center; color: #777; padding: 40px 0; display: none; }
+
+    /* ================= LIGHTBOX: full photo, nothing cropped ================= */
+    .gallery-popup .mfp-figure { margin: 0 auto; }
+    .gallery-popup .mfp-figure figure { margin: 0; }
+
+    .gallery-popup .mfp-img {
+        width: auto !important;
+        height: auto !important;
+        max-width: min(1100px, 92vw) !important;
+        max-height: 82vh !important;
+        padding: 0 !important;
+        margin: 0 auto;
+        aspect-ratio: auto !important;
+        object-fit: contain !important;   /* never crop */
+        background: transparent;
+        border-radius: 16px;
+    }
+    .gallery-popup .mfp-bottom-bar { margin-top: -44px; }
+    .gallery-popup .mfp-counter { color: #f7e3d2; }
+
+    /* fade in / out for the popup */
+    .gallery-popup.mfp-bg { opacity: 0; transition: opacity .2s ease; }
+    .gallery-popup.mfp-bg.mfp-ready { opacity: .85; }
+    .gallery-popup.mfp-bg.mfp-removing { opacity: 0; }
+    .gallery-popup.mfp-wrap .mfp-content { opacity: 0; transition: opacity .2s ease; }
+    .gallery-popup.mfp-wrap.mfp-ready .mfp-content { opacity: 1; }
+    .gallery-popup.mfp-wrap.mfp-removing .mfp-content { opacity: 0; }
+
+    /* ================= RESPONSIVE ================= */
+    @media (max-width: 1199px) { .gallery-grid { gap: 22px; } }
+    @media (max-width: 991px) {
+        .page-header.gallery-hero {
+            width: calc(100% - 20px) !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px 10px 0 !important;
+            border-radius: 24px !important;
+            min-height: 60vh;
+            padding: 150px 0 80px !important;
+        }
+        .page-header.gallery-hero h1 { font-size: 48px; letter-spacing: 2px; }
+        .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 575px) {
+        .page-header.gallery-hero h1 { font-size: 36px; letter-spacing: 1px; }
+        .gallery-grid { grid-template-columns: 1fr; }
+        .gallery-section { padding: 60px 0 80px; }
+        .gallery-filter-btn { padding: 10px 22px; font-size: 14px; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero (same design as About page) -->
+<div class="page-header gallery-hero">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="page-header-box">
+                    <h1 class="text-anime-style-3" data-cursor="-opaque">Gallery</h1>
+                    <nav class="wow fadeInUp" data-wow-delay="0.2s">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'home' %}">home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">gallery</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gallery -->
+<section class="gallery-section">
+    <div class="container">
+
+        <!-- Category filter -->
+        <div class="gallery-filters wow fadeInUp" data-wow-delay="0.2s">
+            <button type="button" class="gallery-filter-btn active" data-filter="all">All</button>
+            {% for category in categories %}
+            <button type="button" class="gallery-filter-btn" data-filter="{{ category.pk }}">
+                {{ category.name }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <!-- Images -->
+        <div class="gallery-grid" id="galleryGrid">
+            {% for img in images %}
+            <a href="{{ img.image.url }}"
+               class="gallery-item wow fadeInUp"
+               data-wow-delay="{% cycle '0s' '0.15s' '0.3s' %}"
+               data-category="{{ img.category_id }}">
+                <img src="{{ img.image.url }}" alt="{{ img.title }}" loading="lazy">
+            </a>
+            {% endfor %}
+        </div>
+
+        <p class="gallery-empty" id="galleryEmpty">No images found.</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var buttons = document.querySelectorAll('.gallery-filter-btn');
+        var items = document.querySelectorAll('.gallery-item');
+        var empty = document.getElementById('galleryEmpty');
+
+        buttons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var filter = btn.getAttribute('data-filter');
+
+                buttons.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+
+                var visible = 0;
+                items.forEach(function (item) {
+                    var show = filter === 'all' || item.getAttribute('data-category') === filter;
+                    item.classList.remove('pop-in');
+                    item.classList.toggle('is-hidden', !show);
+
+                    if (show) {
+                        // restart the animation with a small stagger
+                        void item.offsetWidth;
+                        item.style.animationDelay = (visible % 3) * 0.08 + 's';
+                        item.classList.add('pop-in');
+                        visible++;
+                    }
+                });
+                empty.style.display = visible ? 'none' : 'block';
+            });
+        });
+
+        // Lightbox (Magnific Popup is already loaded in base)
+        if (window.jQuery && $.fn.magnificPopup) {
+            $('#galleryGrid').magnificPopup({
+                delegate: 'a:not(.is-hidden)',
+                type: 'image',
+                mainClass: 'gallery-popup',
+                removalDelay: 200,
+                gallery: { enabled: true },
+                image: { verticalFit: false }   // CSS controls the size, so the photo is never cropped
+            });
+        }
+    })();
+</script>
+{% endblock %}

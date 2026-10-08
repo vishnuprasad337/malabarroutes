@@ -1,0 +1,128 @@
+{% extends "admin_pages/base.html" %}
+
+{% block title %}Experiences | Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="content-card">
+    <div class="card-header flex-wrap gap-2">
+        <h3 class="card-title mb-0">Experiences</h3>
+
+        <div class="d-flex gap-2 flex-wrap">
+            <form method="get" class="d-flex gap-2">
+                <input type="text" name="q" value="{{ query }}" class="form-control"
+                       placeholder="Search experiences...">
+                <button type="submit" class="btn btn-outline-primary">Search</button>
+                {% if query %}
+                    <a href="{% url 'admin_activity_list' %}" class="btn btn-outline-secondary">Clear</a>
+                {% endif %}
+            </form>
+
+            <a href="{% url 'activity_create' %}" class="btn btn-primary">
+                <i class="icofont-plus"></i> Add Experience
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Order</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for activity in activities %}
+                <tr>
+                    <td>{{ activities.start_index|add:forloop.counter0 }}</td>
+                    <td>
+                        {% if activity.image %}
+                            <img src="{{ activity.image.url }}" alt="{{ activity.title }}"
+                                 style="width:60px;height:45px;object-fit:cover;border-radius:6px;">
+                        {% else %}
+                            <span class="text-muted">—</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ activity.title }}</td>
+                    <td>{{ activity.order }}</td>
+                    <td>
+                        {% if activity.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Hidden</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ activity.created_at|date:"d M Y" }}</td>
+                    <td class="text-end">
+                        <a href="{% url 'activity_detail' activity.slug %}" class="btn btn-sm btn-outline-info">View</a>
+                        <a href="{% url 'activity_update' activity.slug %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <button type="button" class="btn btn-sm btn-outline-danger js-delete"
+                                data-url="{% url 'activity_delete' activity.slug %}"
+                                data-title="{{ activity.title }}">Delete</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">
+                        {% if query %}No experiences found for "{{ query }}".{% else %}No experiences added yet.{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if activities.has_other_pages %}
+    <nav class="mt-3">
+        <ul class="pagination justify-content-center mb-0">
+            {% if activities.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ activities.previous_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}">Previous</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">Page {{ activities.number }} of {{ activities.paginator.num_pages }}</span></li>
+            {% if activities.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ activities.next_page_number }}{% if query %}&q={{ query|urlencode }}{% endif %}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Delete confirmation modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form method="post" id="deleteForm">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title">Delete Experience</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete <strong id="deleteName"></strong>? This cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.querySelectorAll('.js-delete').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            document.getElementById('deleteForm').action = this.dataset.url;
+            document.getElementById('deleteName').textContent = this.dataset.title;
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        });
+    });
+</script>
+{% endblock %}
