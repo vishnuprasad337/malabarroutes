@@ -1611,3 +1611,6 @@ def terms(request):
     return render(request, "frontends/terms.html", {
         
     })
+
+def custom_404(request, exception=None):
+    return render(request, "frontends/404.html", status=404)

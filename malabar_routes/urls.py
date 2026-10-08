@@ -20,7 +20,7 @@ urlpatterns = [
     ),
 ]
 
-
+handler404 = "malabar_routes_app.views.custom_404"  
 if settings.DEBUG:
     urlpatterns += static(
         settings.MEDIA_URL,

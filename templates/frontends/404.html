@@ -1,0 +1,351 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <title>Page not found | Malabar</title>
+
+    <link rel="icon" type="image/webp" href="{% static 'malabar-static/logo.webp' %}">
+
+    <!-- Same fonts as base.html -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Marcellus&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green: #265648;
+            --green-dark: #12281f;
+            --gold: #c9972b;
+            --cream: #fcf7f6;
+        }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            color: #2b2b2b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            overflow-x: hidden;
+            background-color: var(--cream);
+            background-image:
+                radial-gradient(circle at 12% 18%, rgba(38, 86, 72, 0.10) 0, rgba(38, 86, 72, 0) 38%),
+                radial-gradient(circle at 88% 82%, rgba(201, 151, 43, 0.14) 0, rgba(201, 151, 43, 0) 36%);
+        }
+
+        /* ================= MOVING BACKGROUND ================= */
+        .nf-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        .nf-bg svg.ic { fill: currentColor; display: block; }
+        .ic-green { color: var(--green); }
+        .ic-gold  { color: var(--gold); }
+
+        /* ---- dotted flight paths (dots slowly travel along the line) ---- */
+        .nf-paths { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .nf-paths path {
+            fill: none;
+            stroke-width: 2.2;
+            stroke-dasharray: 2 10;
+            stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
+            animation: nfDash 6s linear infinite;
+        }
+        .nf-paths .p-gold  { stroke: var(--gold);  opacity: 0.45; }
+        .nf-paths .p-green { stroke: var(--green); opacity: 0.25; animation-duration: 9s; animation-direction: reverse; }
+        @keyframes nfDash { to { stroke-dashoffset: -48; } }
+
+        /* ---- flying airplanes ---- */
+        .fly {
+            position: absolute;
+            left: 0;
+            display: flex;
+            align-items: center;
+            will-change: transform;
+        }
+        .fly .plane {
+            flex: 0 0 auto;
+            animation: nfBobFly 3.2s ease-in-out infinite;
+        }
+        .fly.ltr .plane { rotate: 90deg; }     /* icon points up, so turn it right */
+        .fly.rtl .plane { rotate: -90deg; }    /* ...or left */
+        .fly.rtl { flex-direction: row-reverse; }
+
+        /* dotted trail behind each plane */
+        .fly .trail {
+            flex: 0 0 auto;
+            width: 170px;
+            height: 3px;
+            margin: 0 -6px;
+            background: repeating-linear-gradient(90deg, currentColor 0 3px, transparent 3px 11px);
+            -webkit-mask-image: linear-gradient(to right, transparent, #000);
+                    mask-image: linear-gradient(to right, transparent, #000);
+        }
+        .fly.rtl .trail {
+            -webkit-mask-image: linear-gradient(to left, transparent, #000);
+                    mask-image: linear-gradient(to left, transparent, #000);
+        }
+
+        @keyframes nfFlyRight {
+            from { transform: translateX(-340px); }
+            to   { transform: translateX(calc(100vw + 120px)); }
+        }
+        @keyframes nfFlyLeft {
+            from { transform: translateX(calc(100vw + 120px)); }
+            to   { transform: translateX(-340px); }
+        }
+        @keyframes nfBobFly {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-9px); }
+        }
+
+        /* plane 1: top, left to right */
+        .f1 { top: 10%; color: var(--green); opacity: 0.30; animation: nfFlyRight 22s linear infinite; animation-delay: -6s; }
+        .f1 .plane { width: 56px; }
+        /* plane 2: upper middle, right to left */
+        .f2 { top: 24%; color: var(--gold); opacity: 0.40; animation: nfFlyLeft 28s linear infinite; animation-delay: -14s; }
+        .f2 .plane { width: 44px; }
+        /* plane 3: lower, left to right */
+        .f3 { top: 68%; color: var(--gold); opacity: 0.38; animation: nfFlyRight 30s linear infinite; animation-delay: -20s; }
+        .f3 .plane { width: 48px; }
+        /* plane 4: bottom, right to left */
+        .f4 { top: 84%; color: var(--green); opacity: 0.28; animation: nfFlyLeft 25s linear infinite; animation-delay: -4s; }
+        .f4 .plane { width: 40px; }
+        /* plane 5: middle, small and slow */
+        .f5 { top: 46%; color: var(--green); opacity: 0.20; animation: nfFlyRight 38s linear infinite; animation-delay: -28s; }
+        .f5 .plane { width: 32px; }
+
+        /* ---- drifting clouds ---- */
+        .cloud { position: absolute; left: 0; will-change: transform; color: var(--green); }
+        .cloud svg { width: 100%; height: auto; }
+        @keyframes nfCloud {
+            from { transform: translateX(-260px); }
+            to   { transform: translateX(calc(100vw + 60px)); }
+        }
+        .cl1 { top: 5%;  width: 130px; opacity: 0.08; animation: nfCloud 70s linear infinite; animation-delay: -10s; }
+        .cl2 { top: 36%; width: 160px; opacity: 0.06; animation: nfCloud 90s linear infinite; animation-delay: -55s; }
+        .cl3 { top: 60%; width: 120px; opacity: 0.08; animation: nfCloud 75s linear infinite; animation-delay: -30s; }
+        .cl4 { top: 78%; width: 150px; opacity: 0.06; animation: nfCloud 100s linear infinite; animation-delay: -70s; }
+
+        /* ---- floating location pins ---- */
+        .pin { position: absolute; animation: nfBob 4s ease-in-out infinite; }
+        .pin svg { width: 100%; height: auto; }
+        @keyframes nfBob {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-14px); }
+        }
+        .pn1 { width: 38px; top: 26%; left: 20%;  color: var(--gold);  opacity: 0.30; }
+        .pn2 { width: 30px; top: 80%; left: 30%;  color: var(--green); opacity: 0.22; animation-delay: -1s; }
+        .pn3 { width: 42px; top: 30%; right: 20%; color: var(--green); opacity: 0.30; animation-delay: -2s; }
+        .pn4 { width: 28px; top: 84%; right: 26%; color: var(--gold);  opacity: 0.20; animation-delay: -3s; }
+        .pn5 { width: 24px; top: 8%;  left: 42%;  color: var(--green); opacity: 0.18; animation-delay: -1.5s; }
+        .pn6 { width: 24px; top: 56%; right: 4%;  color: var(--gold);  opacity: 0.18; animation-delay: -2.5s; }
+
+        /* ================= PAGE CONTENT ================= */
+        .nf-content { position: relative; z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+        .nf-logo img { height: 80px; width: auto; display: block; margin: 0 auto 26px; }
+
+        .nf-code {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(4px, 1.5vw, 14px);
+            font-family: 'Marcellus', serif;
+            font-weight: 400;
+            font-size: clamp(110px, 24vw, 230px);
+            line-height: 1;
+            color: var(--green);
+            margin: 0;
+        }
+        .nf-pin {
+            width: 0.62em;
+            height: 0.8em;
+            color: var(--gold);
+            animation: nfFloat 3s ease-in-out infinite;
+            filter: drop-shadow(0 10px 12px rgba(201, 151, 43, 0.35));
+        }
+        @keyframes nfFloat {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-12px); }
+        }
+
+        .nf-route {
+            width: min(520px, 80%);
+            height: 40px;
+            margin: 4px auto 0;
+            color: var(--gold);
+        }
+        .nf-route path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.4;
+            stroke-dasharray: 1 9;
+            stroke-linecap: round;
+            vector-effect: non-scaling-stroke;
+            animation: nfDash 5s linear infinite;
+        }
+
+        .nf-title {
+            font-family: 'Marcellus', serif;
+            font-weight: 400;
+            font-size: clamp(24px, 4.5vw, 40px);
+            color: #111111;
+            margin: 22px 0 12px;
+        }
+        .nf-text {
+            font-family: 'DM Sans', sans-serif;
+            font-size: 18px;
+            line-height: 1.65;
+            color: #5b6560;
+            margin: 0 auto 32px;
+            max-width: 480px;
+        }
+
+        .nf-btns { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+        .nf-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 15px 36px;
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px; font-weight: 600;
+            text-decoration: none;
+            border: 1.5px solid var(--green);
+            transition: all 0.3s ease;
+        }
+        .nf-btn-fill { background: var(--green); color: #ffffff; }
+        .nf-btn-fill:hover { background: var(--gold); border-color: var(--gold); }
+        .nf-btn-line { background: rgba(255, 255, 255, 0.6); color: var(--green); }
+        .nf-btn-line:hover { background: var(--green); color: #ffffff; }
+
+        .nf-links { margin-top: 32px; font-size: 14px; color: #8a948f; }
+        .nf-links a {
+            color: var(--green); text-decoration: none; margin: 0 10px; font-weight: 600;
+            border-bottom: 1px solid transparent; transition: all 0.25s ease;
+        }
+        .nf-links a:hover { color: var(--gold); border-bottom-color: var(--gold); }
+
+        /* people who prefer no motion get a still background */
+        @media (prefers-reduced-motion: reduce) {
+            .fly, .fly .plane, .cloud, .pin, .nf-pin, .nf-paths path, .nf-route path { animation: none !important; }
+            .f1 { transform: translateX(8vw); }
+            .f2 { transform: translateX(70vw); }
+            .f3 { transform: translateX(20vw); }
+            .f4 { transform: translateX(60vw); }
+            .f5 { display: none; }
+            .cl1 { transform: translateX(20vw); } .cl2 { transform: translateX(60vw); }
+            .cl3 { transform: translateX(10vw); } .cl4 { transform: translateX(75vw); }
+        }
+        @media (max-width: 767px) {
+            .f5, .pn2, .pn4, .pn5, .pn6, .cl2, .cl4 { display: none; }
+            .fly .trail { width: 110px; }
+        }
+        @media (max-width: 575px) {
+            .nf-logo img { height: 64px; margin-bottom: 18px; }
+            .nf-text { font-size: 16px; }
+            .nf-btn { padding: 13px 28px; font-size: 14px; }
+            .nf-links a { display: inline-block; margin: 6px 8px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Icon library (defined once, reused below) -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <symbol id="i-plane" viewBox="0 0 24 24">
+                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+            </symbol>
+            <symbol id="i-pin" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </symbol>
+            <symbol id="i-cloud" viewBox="0 0 24 24">
+                <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"/>
+            </symbol>
+        </defs>
+    </svg>
+
+    <!-- Moving background -->
+    <div class="nf-bg" aria-hidden="true">
+
+        <!-- dotted flight paths -->
+        <svg class="nf-paths" viewBox="0 0 1000 600" preserveAspectRatio="none">
+            <path class="p-gold"  d="M70 90 C 220 40, 300 200, 430 120 S 600 30, 720 110"/>
+            <path class="p-green" d="M80 520 C 200 440, 320 560, 440 500"/>
+            <path class="p-gold"  d="M560 520 C 680 580, 800 440, 930 500"/>
+            <path class="p-green" d="M640 80 C 740 20, 860 120, 940 70"/>
+        </svg>
+
+        <!-- clouds drifting -->
+        <div class="cloud cl1"><svg class="ic" viewBox="0 0 24 24"><use href="#i-cloud"/></svg></div>
+        <div class="cloud cl2"><svg class="ic" viewBox="0 0 24 24"><use href="#i-cloud"/></svg></div>
+        <div class="cloud cl3"><svg class="ic" viewBox="0 0 24 24"><use href="#i-cloud"/></svg></div>
+        <div class="cloud cl4"><svg class="ic" viewBox="0 0 24 24"><use href="#i-cloud"/></svg></div>
+
+        <!-- floating pins -->
+        <div class="pin pn1"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg></div>
+        <div class="pin pn2"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg></div>
+        <div class="pin pn3"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg></div>
+        <div class="pin pn4"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg></div>
+        <div class="pin pn5"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg></div>
+        <div class="pin pn6"><svg class="ic" viewBox="0 0 24 24"><use href="#i-pin"/></svg></div>
+
+        <!-- airplanes flying across with a dotted trail -->
+        <div class="fly ltr f1"><span class="trail"></span><svg class="ic plane" viewBox="0 0 24 24"><use href="#i-plane"/></svg></div>
+        <div class="fly rtl f2"><span class="trail"></span><svg class="ic plane" viewBox="0 0 24 24"><use href="#i-plane"/></svg></div>
+        <div class="fly ltr f3"><span class="trail"></span><svg class="ic plane" viewBox="0 0 24 24"><use href="#i-plane"/></svg></div>
+        <div class="fly rtl f4"><span class="trail"></span><svg class="ic plane" viewBox="0 0 24 24"><use href="#i-plane"/></svg></div>
+        <div class="fly ltr f5"><span class="trail"></span><svg class="ic plane" viewBox="0 0 24 24"><use href="#i-plane"/></svg></div>
+    </div>
+
+    <!-- Page content -->
+    <div class="nf-content">
+
+        <a class="nf-logo" href="{% url 'home' %}">
+            <img src="{% static 'malabar-static/logo.webp' %}" alt="Malabaroutes">
+        </a>
+
+        <h1 class="nf-code" aria-label="404">
+            <span>4</span>
+            <svg class="nf-pin" viewBox="0 0 60 80" aria-hidden="true">
+                <path fill="currentColor" d="M30 0C13.4 0 0 13.4 0 30c0 22 30 50 30 50s30-28 30-50C60 13.4 46.6 0 30 0z"/>
+                <circle cx="30" cy="29" r="12" fill="#fcf7f6"/>
+            </svg>
+            <span>4</span>
+        </h1>
+
+        <svg class="nf-route" viewBox="0 0 520 40" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 24 C 70 4, 130 38, 200 22 S 330 6, 400 24 S 490 34, 520 16"/>
+        </svg>
+
+        <h2 class="nf-title">Looks like you took a wrong turn</h2>
+        <p class="nf-text">The page you are looking for does not exist or may have been moved. Let's get you back on the road.</p>
+
+        <div class="nf-btns">
+            <a href="{% url 'home' %}" class="nf-btn nf-btn-fill">Back to Home</a>
+            <a href="{% url 'contact' %}" class="nf-btn nf-btn-line">Contact Us</a>
+        </div>
+
+        <div class="nf-links">
+            Or explore:
+            <a href="{% url 'packages' %}">Packages</a>
+            <a href="{% url 'activities' %}">Experiences</a>
+            <a href="{% url 'destinations' %}">Destinations</a>
+        </div>
+
+    </div>
+
+</body>
+</html>
