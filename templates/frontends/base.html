@@ -483,7 +483,24 @@ background-position: center 70% !important;
         .footer-main .footer-social-links ul { justify-content: flex-start !important; padding-left: 0; }
     }
 
-    
+        /* ================= MOBILE / TABLET ONLY: zoom the navbar background so the corner circles are cropped out ================= */
+    @media (max-width: 991px) {
+        .main-header .header-sticky,
+        .main-header .header-sticky.hide,
+        .main-header .header-sticky.active {
+            background-size: 150% auto !important;      /* zoom: higher = more zoomed in */
+            background-position: center 65% !important; /* move the pattern up/down */
+        }
+    }
+
+    /* very small phones: zoom a little more */
+    @media (max-width: 480px) {
+        .main-header .header-sticky,
+        .main-header .header-sticky.hide,
+        .main-header .header-sticky.active {
+            background-size: 190% auto !important;
+        }
+    }
 </style>
 
     {% block extra_css %}{% endblock %}

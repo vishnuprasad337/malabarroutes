@@ -201,6 +201,96 @@
         .ad-book { flex-direction: column; align-items: flex-start; }
         .ad-box { padding: 24px 20px; }
     }
+        /* ================= HERO: same as About page ================= */
+    .page-header.page-hero {
+        min-height: calc(80vh - 16px) !important;
+        padding: 200px 0 120px !important;
+        background-image:
+            linear-gradient(rgba(0, 0, 0, 0.30), rgba(0, 0, 0, 0.30)),    /* same overlay as About */
+            url('{% if destination.image %}{{ destination.image.url }}{% else %}{% static "malabar-static/mr5.webp" %}{% endif %}') !important;
+    }
+
+    @media (max-width: 991px) {
+        .page-header.page-hero {
+            width: calc(100% - 20px) !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px 10px 0 !important;
+            border-radius: 24px !important;
+            min-height: 46vh !important;
+            padding: 130px 0 65px !important;
+        }
+        .page-header.page-hero .page-header-box,
+        .page-header.page-hero h1,
+        .page-header.page-hero nav {
+            text-align: center !important;
+            width: 100%;
+        }
+        .page-header.page-hero h1 {
+            font-size: 34px !important;       /* exactly like About */
+            letter-spacing: 2px !important;
+            line-height: 1.2;
+            margin-bottom: 14px !important;
+        }
+        .page-header.page-hero .breadcrumb {
+            justify-content: center !important;
+            font-size: 14px;
+        }
+
+        .ad-section { padding: 50px 0 60px; }
+        .ad-stack { gap: 26px; }
+    }
+
+    /* ================= MOBILE: sizes and buttons ================= */
+    @media (max-width: 575px) {
+        .page-header.page-hero h1 {
+            font-size: 28px !important;       /* exactly like About */
+            letter-spacing: 1.5px !important;
+        }
+
+        .ad-title { font-size: 26px; }
+        .ad-label, .ad-box h3 { font-size: 21px; }
+        .ad-desc, .ad-desc p { font-size: 15px; line-height: 1.75; }
+
+        .ad-facts { gap: 10px; margin-top: 16px; }
+        .ad-fact { padding: 10px 16px; }
+        .ad-fact strong { font-size: 14.5px; }
+
+        /* "Ready to visit ...?" row: text on top, button below, centered */
+        .ad-book {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 14px;
+        }
+        .ad-book p { font-size: 19px; }
+
+        /* all Book Now buttons: compact, arrow beside the text */
+        .ad-btn {
+            padding: 11px 26px;
+            font-size: 14px;
+            gap: 8px;
+            line-height: 1.2;
+        }
+        .ad-btn i { font-size: 11px; }
+        .ad-book .ad-btn { min-width: 170px; justify-content: center; }
+
+        /* sidebar Book Now: full width of the card */
+        .ad-btn-light {
+            width: 100%;
+            padding: 12px 20px;
+            justify-content: center;
+        }
+
+        .ad-sidebar { gap: 20px; }
+        .ad-box { padding: 22px 18px; }
+        .ad-list a { font-size: 14.5px; padding: 12px 0; }
+        .ad-cta .ad-cta-icon { width: 52px; height: 52px; font-size: 22px; margin-bottom: 14px; }
+        .ad-cta .ad-call a { font-size: 16px; }
+    }
+
+    @media (max-width: 360px) {
+        .ad-btn { padding: 10px 20px; font-size: 13px; }
+    }
 </style>
 {% endblock %}
 
@@ -311,7 +401,7 @@
                             <i class="fa-solid fa-phone"></i>
                             <div>
                                 <small>Call us</small>
-                                <a href="tel:+91 9446 0626 66">+91 9446 0626 66</a>
+                                <a href="tel:+919446062666">+91 94460 62666</a>
                             </div>
                         </div>
                     </div>

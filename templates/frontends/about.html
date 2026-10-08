@@ -848,6 +848,7 @@
         .fq-ico::before, .fq-ico::after { width: 11px; }
         .fq-a p { padding: 0 14px 16px 14px; font-size: 13.5px; line-height: 1.6; }
     }
+    
 </style>
 {% endblock %}
 
@@ -1039,6 +1040,76 @@
             height: 16px !important;
         }
     }
+     /* ================= OUR STORY: 2x2 point cards (colour from base.html) ================= */
+    .about-story .st-route {
+        --st-accent: var(--accent-color, #265648);
+        --st-border: #cfdcd3;
+        --st-border: color-mix(in srgb, var(--st-accent) 28%, #ffffff);
+        --st-shadow: rgba(20, 40, 30, 0.10);
+        --st-shadow: color-mix(in srgb, var(--st-accent) 18%, transparent);
+
+        margin: 6px 0 34px;
+        padding: 0;
+    }
+
+    .about-story .st-wave,
+    .about-story .st-pin { display: none !important; }
+    .about-story .st-route::before,
+    .about-story .st-route::after { content: none !important; display: none !important; }
+
+    .about-story .st-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 0;
+    }
+
+    .about-story .st-item {
+        padding: 22px 18px 24px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid var(--st-border);
+        border-radius: 14px;
+        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .about-story .st-item:hover {
+        transform: translateY(-4px);
+        border-color: var(--st-accent);
+        box-shadow: 0 14px 28px var(--st-shadow);
+    }
+
+    .about-story .st-ico {
+        display: block;
+        font-size: 40px;
+        color: var(--st-accent);              /* icon colour from base.html */
+        margin: 0 0 12px;
+        transition: transform .3s ease;
+    }
+    .about-story .st-item:hover .st-ico { transform: scale(1.08); }
+
+    .about-story .st-item h4 {
+        margin: 0 0 8px;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--st-accent);              /* title colour from base.html */
+        text-transform: none;
+    }
+    .about-story .st-item p {
+        margin: 0 auto;
+        max-width: 190px;
+        font-size: 14.5px;
+        line-height: 1.5;
+        color: #5b6560;
+    }
+
+    @media (max-width: 575px) {
+        .about-story .st-grid { gap: 12px; }
+        .about-story .st-item { padding: 16px 10px 18px; border-radius: 12px; }
+        .about-story .st-ico { font-size: 30px; margin-bottom: 8px; }
+        .about-story .st-item h4 { font-size: 16px; }
+        .about-story .st-item p { font-size: 12.5px; max-width: none; }
+    }
 </style>
 
 <div class="about-us about-story">
@@ -1065,21 +1136,49 @@
                     </div>
 
                     <div class="about-us-body">
-                        <div class="about-body-content">
-                            <div class="about-body-list wow fadeInUp" data-wow-delay="0.4s">
-                                <ul>
-                                    <li>Travel services of the highest quality</li>
-                                    <li>Excellence in customer service is our mantra</li>
-                                    <li>Led by an experienced management team</li>
-                                    <li>We are there if anything unexpected occurs on your trip</li>
-                                </ul>
-                            </div>
-                            <div class="about-body-footer wow fadeInUp" data-wow-delay="0.6s">
-                                <a href="{% url 'contact' %}" class="btn-default">contact us</a>
-                                <!-- Book Now replaces the old "play session" video button; opens the booking modal from base.html -->
-                                <a href="#" class="btn-default btn-book open-booking">book now</a>
-                            </div>
-                        </div>
+    <div class="about-body-content">
+
+        <div class="st-route wow fadeInUp" data-wow-delay="0.4s">
+            <svg class="st-wave" viewBox="0 0 600 44" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M0 30 C 40 30, 60 10, 100 12 S 200 34, 300 26 S 420 6, 500 14 S 580 28, 600 28" />
+            </svg>
+
+            <div class="st-grid">
+                <div class="st-item">
+                    <i class="fa-solid fa-location-dot st-pin"></i>
+                    <i class="fa-solid fa-award st-ico"></i>
+                    <h4>Top quality</h4>
+                    <p>Travel services of the highest quality</p>
+                </div>
+                <div class="st-item">
+                    <i class="fa-solid fa-location-dot st-pin"></i>
+                    <i class="fa-solid fa-headset st-ico"></i>
+                    <h4>Great service</h4>
+                    <p>Excellence in customer service is our mantra</p>
+                </div>
+                <div class="st-item">
+                    <i class="fa-solid fa-location-dot st-pin"></i>
+                    <i class="fa-solid fa-user-tie st-ico"></i>
+                    <h4>Expert team</h4>
+                    <p>Led by an experienced management team</p>
+                </div>
+                <div class="st-item">
+                    <i class="fa-solid fa-location-dot st-pin"></i>
+                    <i class="fa-solid fa-shield-heart st-ico"></i>
+                    <h4>Always with you</h4>
+                    <p>We are there if anything unexpected occurs on your trip</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="about-body-footer wow fadeInUp" data-wow-delay="0.6s">
+            <a href="{% url 'contact' %}" class="btn-default">contact us</a>
+            <!-- Book Now opens the booking modal from base.html -->
+            <a href="#" class="btn-default btn-book open-booking">book now</a>
+        </div>
+
+    </div>
+</div>
 
                         
                     </div>

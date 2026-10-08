@@ -195,6 +195,69 @@
         .gallery-section { padding: 60px 0 80px; }
         .gallery-filter-btn { padding: 10px 22px; font-size: 14px; }
     }
+        /* ================= HERO: Cinzel font, same as About ================= */
+    .page-header.gallery-hero h1 {
+        font-family: 'Cinzel', serif !important;
+        font-weight: 700 !important;
+        letter-spacing: 6px;
+    }
+
+    /* ================= MOBILE: hero same as About page ================= */
+    @media (max-width: 991px) {
+        .page-header.gallery-hero {
+            width: calc(100% - 20px) !important;
+            max-width: calc(100% - 20px) !important;
+            margin: 10px 10px 0 !important;
+            border-radius: 24px !important;
+            min-height: 46vh !important;
+            padding: 130px 0 65px !important;
+        }
+        .page-header.gallery-hero .page-header-box,
+        .page-header.gallery-hero h1,
+        .page-header.gallery-hero nav {
+            text-align: center !important;
+            width: 100%;
+        }
+        .page-header.gallery-hero h1 {
+            font-size: 34px !important;
+            letter-spacing: 2px !important;
+            margin-bottom: 14px !important;
+        }
+        .page-header.gallery-hero .breadcrumb {
+            justify-content: center !important;
+            font-size: 14px;
+        }
+
+        .gallery-section { padding: 50px 0 70px; }
+        .gallery-filters { gap: 10px; margin-bottom: 34px; }
+        .gallery-grid { gap: 16px; }
+        .gallery-item { border-radius: 20px; }
+    }
+
+    @media (max-width: 575px) {
+        .page-header.gallery-hero h1 {
+            font-size: 28px !important;
+            letter-spacing: 1.5px !important;
+        }
+
+        .gallery-section { padding: 40px 0 60px; }
+        .gallery-filters { gap: 8px; margin-bottom: 26px; }
+        .gallery-filter-btn {
+            padding: 8px 18px;
+            font-size: 13px;
+            border-width: 1.2px;
+        }
+        .gallery-grid { gap: 14px; }
+        .gallery-item { border-radius: 18px; }
+        .gallery-item::after { font-size: 24px; }
+
+        /* lightbox fits the phone screen */
+        .gallery-popup .mfp-img {
+            max-width: 94vw !important;
+            max-height: 74vh !important;
+            border-radius: 12px;
+        }
+    }
 </style>
 {% endblock %}
 

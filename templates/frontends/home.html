@@ -2017,6 +2017,34 @@
     @media (max-width: 991px) {
         .top-bar-inner { padding: 0 14px; }
     }
+        /* ================= TOP BAR: hidden while the preloader is showing ================= */
+    .top-bar {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity .5s ease, visibility .5s ease;
+    }
+    body.page-loaded .top-bar {
+        opacity: 1;
+        visibility: visible;
+    }
+        /* ================= MOBILE / TABLET: no contact badge, hero moved up ================= */
+    @media (max-width: 991px) {
+        /* remove the badge completely */
+        .top-bar { display: none !important; }
+
+        /* hero starts near the top of the screen (was 34px) */
+        .hero { padding: 12px 12px 8px !important; }
+
+        .hero .hero-section,
+        .hero .hero-section.hero-bg-image {
+            min-height: calc(100vh - 20px);          /* fallback */
+            min-height: calc(100svh - 20px);         /* a bit taller, since the badge space is gone */
+            padding: 170px 0 90px !important;        /* was 190px: text sits slightly higher */
+        }
+
+        /* navbar floats inside the hero with the same gap as before (was top: 50px) */
+        .main-header { top: 28px !important; }
+    }
 </style>
 {% endblock %}
 
@@ -3234,6 +3262,33 @@
         if (bar && bar.parentNode !== document.body) {
             document.body.appendChild(bar);
         }
+    })();
+</script>
+<!-- Show the top bar only after the preloader has finished -->
+<script>
+    (function () {
+        function reveal() { document.body.classList.add('page-loaded'); }
+
+        function waitForPreloader() {
+            var pre = document.querySelector('.preloader');
+            if (!pre) { reveal(); return; }
+
+            var check = setInterval(function () {
+                var s = window.getComputedStyle(pre);
+                var gone = s.display === 'none' ||
+                           s.visibility === 'hidden' ||
+                           parseFloat(s.opacity) === 0 ||
+                           pre.offsetHeight === 0 ||
+                           !document.body.contains(pre);
+                if (gone) { clearInterval(check); reveal(); }
+            }, 100);
+
+            /* safety: always show the bar after 4 seconds */
+            setTimeout(function () { clearInterval(check); reveal(); }, 4000);
+        }
+
+        if (document.readyState === 'complete') waitForPreloader();
+        else window.addEventListener('load', waitForPreloader);
     })();
 </script>
 {% endblock %}
