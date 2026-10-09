@@ -815,7 +815,8 @@
         .fq-ico { flex-basis: 34px; width: 34px; height: 34px; }
         .fq-a p { padding: 0 18px 22px 18px; font-size: 15px; }
     }
-        /* ===== Mobile: smaller Packages + FAQ sections ===== */
+
+    /* ===== Mobile: smaller Packages + FAQ sections ===== */
     @media (max-width: 575px) {
 
         /* ---- Popular Packages ---- */
@@ -848,7 +849,6 @@
         .fq-ico::before, .fq-ico::after { width: 11px; }
         .fq-a p { padding: 0 14px 16px 14px; font-size: 13.5px; line-height: 1.6; }
     }
-    
 </style>
 {% endblock %}
 
@@ -916,7 +916,7 @@
             min-height: 46vh;
             padding: 130px 0 65px !important;
         }
-                .page-header.about-hero .page-header-box,
+        .page-header.about-hero .page-header-box,
         .page-header.about-hero h1,
         .page-header.about-hero nav {
             text-align: center !important;
@@ -935,7 +935,6 @@
 
     @media (max-width: 575px) {
         .page-header.about-hero h1 { font-size: 28px !important; letter-spacing: 1.5px !important; }
-    
     }
 </style>
 
@@ -963,16 +962,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@600;700&family=Montserrat:wght@500;600&display=swap" rel="stylesheet">
 
 <style>
-    /* section background image (light overlay keeps the text readable) */
+    /* ================= OUR STORY ================= */
     .about-us.about-story {
         width: 100% !important;
         max-width: 100% !important;
         margin: 0 !important;
         border-radius: 0 !important;
-        padding: 130px 0 150px !important;
+        padding: 110px 0 130px !important;
         background-color: #fcf7f6 !important;
         background-image:
-            /* bottom fade: dissolves into the Services section colour */
             linear-gradient(to bottom, rgba(252, 247, 246, 0) calc(100% - 200px), #fcf7f6 100%),
             linear-gradient(rgba(252, 247, 246, 0.55), rgba(252, 247, 246, 0.55)),
             url('{% static 'malabar-static/mr5.png' %}') !important;
@@ -981,25 +979,165 @@
         background-repeat: no-repeat, no-repeat, no-repeat !important;
     }
 
+    /* wide centred container */
+    .about-us.about-story .container { max-width: 1320px; }
+    @media (min-width: 1600px) { .about-us.about-story .container { max-width: 1440px; } }
+
+    /* two columns, vertically centred */
+    .about-us.about-story .row { align-items: center; row-gap: 50px; }
+    @media (min-width: 992px) {
+        .about-us.about-story .story-col-img  { padding-right: 40px; }
+        .about-us.about-story .story-col-text { padding-left: 40px; }
+    }
+
+    /* ---------- image collage (fixed size) ---------- */
+    .about-story .about-us-image {
+        position: relative;
+        width: 100%;
+        max-width: 620px;
+        height: 640px;
+        margin: 0 auto;
+        padding: 0 !important;
+    }
+    .about-story .about-us-image .about-img-1,
+    .about-story .about-us-image .about-img-2 {
+        position: absolute !important;
+        margin: 0 !important;
+        overflow: hidden;
+    }
+    .about-story .about-us-image .about-img-1 {
+        top: 0; left: 0;
+        width: 68%; height: 82%;
+        border-radius: 28px;
+    }
+    .about-story .about-us-image .about-img-2 {
+        right: 0; bottom: 0;
+        width: 58%; height: 38%;
+        padding: 8px;
+        background: #fff;
+        border-radius: 28px;
+        box-shadow: 0 18px 36px rgba(20, 40, 30, 0.18);
+    }
+    .about-story .about-us-image figure { width: 100%; height: 100%; margin: 0; }
+    .about-story .about-us-image img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover;
+        display: block;
+        border-radius: 22px;
+    }
+    .about-story .about-us-image .about-img-1 img { border-radius: 28px; }
+
+    /* ---------- text column ---------- */
+    .about-story .about-us-content { width: 100%; max-width: 100%; }
+
+    .about-story .section-title { margin-bottom: 0; }
     .about-story .section-title h2 {
         font-family: 'Cormorant SC', serif !important;
         font-weight: 700 !important;
         font-size: 56px;
         color: #111111 !important;
         text-transform: none !important;
-    }
-    .about-story .section-title p,
-    .about-story .about-body-list li {
-        font-family: 'Montserrat', sans-serif;
-        font-weight: 500;
-        color: #3d332a;
+        margin-bottom: 14px;
     }
 
-    /* Story buttons: Contact Us + Book Now, side by side */
+    /* story paragraph: shortened to 6 lines, opens with "Read more" */
+    .about-story .st-text {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 1.8;
+        color: #3d332a;
+        margin: 0;
+    }
+    .about-story .st-text.collapsed {
+        display: -webkit-box;
+        -webkit-line-clamp: 6;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .about-story .st-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 10px;
+        padding: 0;
+        background: none;
+        border: 0;
+        cursor: pointer;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        color: #265648;
+    }
+    .about-story .st-more i { font-size: 12px; transition: transform 0.3s ease; }
+    .about-story .st-more.open i { transform: rotate(180deg); }
+    .about-story .st-more:hover { color: #c9972b; }
+
+    /* ---------- 2x2 point cards ---------- */
+    .about-story .st-route {
+        --st-accent: var(--accent-color, #265648);
+        --st-border: #cfdcd3;
+        --st-border: color-mix(in srgb, var(--st-accent) 28%, #ffffff);
+        --st-shadow: rgba(20, 40, 30, 0.10);
+        --st-shadow: color-mix(in srgb, var(--st-accent) 18%, transparent);
+        margin: 26px 0 26px;
+        padding: 0;
+        width: 100%;
+    }
+    .about-story .st-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin: 0;
+        width: 100%;
+    }
+    .about-story .st-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 18px 22px;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.75);
+        border: 1px solid var(--st-border);
+        border-radius: 14px;
+        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    }
+    .about-story .st-item:hover {
+        transform: translateY(-4px);
+        border-color: var(--st-accent);
+        box-shadow: 0 14px 28px var(--st-shadow);
+    }
+    .about-story .st-ico {
+        display: block;
+        font-size: 36px;
+        color: var(--st-accent);
+        margin: 0 0 10px;
+        transition: transform .3s ease;
+    }
+    .about-story .st-item:hover .st-ico { transform: scale(1.08); }
+    .about-story .st-item h4 {
+        margin: 0 0 6px;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--st-accent);
+        text-transform: none;
+    }
+    .about-story .st-item p {
+        margin: 0 auto;
+        max-width: 220px;
+        font-size: 14.5px;
+        line-height: 1.5;
+        color: #5b6560;
+    }
+
+    /* ---------- buttons ---------- */
     .about-story .about-body-footer {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
+        justify-content: flex-start;
         gap: 16px;
     }
     .about-story .about-body-footer .btn-default.btn-book {
@@ -1012,13 +1150,14 @@
         color: #fff;
     }
 
-        @media (max-width: 991px) {
-        .about-us.about-story { padding: 100px 0 110px !important; }
+    /* ---------- tablet ---------- */
+    @media (max-width: 991px) {
+        .about-us.about-story { padding: 80px 0 90px !important; }
         .about-story .section-title h2 { font-size: 42px; }
-
-                .about-story .about-body-footer { gap: 10px; }
+        .about-story .about-us-image { height: 520px; max-width: 520px; }
+        .about-story .about-body-footer { gap: 10px; }
         .about-story .about-body-footer .btn-default {
-            padding: 12px 46px 12px 20px !important;   /* right side keeps room for the arrow */
+            padding: 12px 46px 12px 20px !important;
             font-size: 14px !important;
         }
         .about-story .about-body-footer .btn-default::before {
@@ -1029,7 +1168,18 @@
         }
     }
 
+    /* ---------- mobile ---------- */
     @media (max-width: 575px) {
+        .about-story .section-title h2 { font-size: 34px; }
+        .about-story .about-us-image { height: 380px; }
+        .about-story .about-us-image .about-img-2 { padding: 5px; border-radius: 20px; }
+        .about-story .st-text { font-size: 15px; }
+        .about-story .st-text.collapsed { -webkit-line-clamp: 5; }
+        .about-story .st-grid { gap: 12px; }
+        .about-story .st-item { padding: 16px 10px 18px; border-radius: 12px; }
+        .about-story .st-ico { font-size: 30px; margin-bottom: 8px; }
+        .about-story .st-item h4 { font-size: 16px; }
+        .about-story .st-item p { font-size: 12.5px; max-width: none; }
         .about-story .about-body-footer .btn-default {
             padding: 10px 40px 10px 16px !important;
             font-size: 13px !important;
@@ -1040,82 +1190,14 @@
             height: 16px !important;
         }
     }
-     /* ================= OUR STORY: 2x2 point cards (colour from base.html) ================= */
-    .about-story .st-route {
-        --st-accent: var(--accent-color, #265648);
-        --st-border: #cfdcd3;
-        --st-border: color-mix(in srgb, var(--st-accent) 28%, #ffffff);
-        --st-shadow: rgba(20, 40, 30, 0.10);
-        --st-shadow: color-mix(in srgb, var(--st-accent) 18%, transparent);
-
-        margin: 6px 0 34px;
-        padding: 0;
-    }
-
-    .about-story .st-wave,
-    .about-story .st-pin { display: none !important; }
-    .about-story .st-route::before,
-    .about-story .st-route::after { content: none !important; display: none !important; }
-
-    .about-story .st-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-        margin: 0;
-    }
-
-    .about-story .st-item {
-        padding: 22px 18px 24px;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.75);
-        border: 1px solid var(--st-border);
-        border-radius: 14px;
-        transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-    }
-    .about-story .st-item:hover {
-        transform: translateY(-4px);
-        border-color: var(--st-accent);
-        box-shadow: 0 14px 28px var(--st-shadow);
-    }
-
-    .about-story .st-ico {
-        display: block;
-        font-size: 40px;
-        color: var(--st-accent);              /* icon colour from base.html */
-        margin: 0 0 12px;
-        transition: transform .3s ease;
-    }
-    .about-story .st-item:hover .st-ico { transform: scale(1.08); }
-
-    .about-story .st-item h4 {
-        margin: 0 0 8px;
-        font-size: 20px;
-        font-weight: 700;
-        line-height: 1.2;
-        color: var(--st-accent);              /* title colour from base.html */
-        text-transform: none;
-    }
-    .about-story .st-item p {
-        margin: 0 auto;
-        max-width: 190px;
-        font-size: 14.5px;
-        line-height: 1.5;
-        color: #5b6560;
-    }
-
-    @media (max-width: 575px) {
-        .about-story .st-grid { gap: 12px; }
-        .about-story .st-item { padding: 16px 10px 18px; border-radius: 12px; }
-        .about-story .st-ico { font-size: 30px; margin-bottom: 8px; }
-        .about-story .st-item h4 { font-size: 16px; }
-        .about-story .st-item p { font-size: 12.5px; max-width: none; }
-    }
 </style>
 
 <div class="about-us about-story">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
+        <div class="row">
+
+            <!-- Left: images -->
+            <div class="col-lg-6 story-col-img">
                 <div class="about-us-image">
                     <div class="about-img-1">
                         <figure class="image-anime reveal"><img src="{% static 'malabar-static/malabat-r1.webp' %}" alt=""></figure>
@@ -1123,70 +1205,62 @@
                     <div class="about-img-2">
                         <figure class="image-anime reveal"><img src="{% static 'malabar-static/mr33.png' %}" alt=""></figure>
                     </div>
-
                 </div>
             </div>
 
-            <div class="col-lg-6">
+            <!-- Right: content -->
+            <div class="col-lg-6 story-col-text">
                 <div class="about-us-content">
+
                     <div class="section-title">
                         <h3 class="wow fadeInUp">about us</h3>
                         <h2 class="text-anime-style-3" data-cursor="-opaque">Our Story</h2>
-                        <p class="wow fadeInUp" data-wow-delay="0.2s">We cater to the domestic travel enthusiasts in Kerala, mainly focusing on north Kerala who wishes to travel to places abroad or to unexplored destinations in Malabar region. We are committed to offering travel services of the highest quality, combining our energy and enthusiasm, with our years of experience.</p>
+
+                        <p class="st-text collapsed wow fadeInUp" id="stText" data-wow-delay="0.2s">We cater to the domestic travel enthusiasts in Kerala, mainly focusing on north Kerala who wishes to travel to places abroad or to unexplored destinations in Malabar region. We are committed to offering travel services of the highest quality, combining our energy and enthusiasm, with our years of experience. Our greatest satisfaction comes in serving large numbers of satisfied clients who have experienced the joys and inspiration of travel. Knowledge of our field paired with excellence in customer service is our mantra. Our goal is to exceed your expectations every time with outstanding service. We are led by an experienced management team. We will be there for you if anything unexpected occurs on your trip. We have the education and the experience to ensure you enjoy exceptional travel experiences throughout your lifetime. “when traveling with us &amp; explore the other sides of gods own country”.</p>
+
+                        <button type="button" class="st-more" id="stMore" aria-expanded="false" aria-controls="stText">
+                            <span>Read more</span> <i class="fa-solid fa-chevron-down"></i>
+                        </button>
                     </div>
 
-                    <div class="about-us-body">
-    <div class="about-body-content">
-
-        <div class="st-route wow fadeInUp" data-wow-delay="0.4s">
-            <svg class="st-wave" viewBox="0 0 600 44" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M0 30 C 40 30, 60 10, 100 12 S 200 34, 300 26 S 420 6, 500 14 S 580 28, 600 28" />
-            </svg>
-
-            <div class="st-grid">
-                <div class="st-item">
-                    <i class="fa-solid fa-location-dot st-pin"></i>
-                    <i class="fa-solid fa-award st-ico"></i>
-                    <h4>Top quality</h4>
-                    <p>Travel services of the highest quality</p>
-                </div>
-                <div class="st-item">
-                    <i class="fa-solid fa-location-dot st-pin"></i>
-                    <i class="fa-solid fa-headset st-ico"></i>
-                    <h4>Great service</h4>
-                    <p>Excellence in customer service is our mantra</p>
-                </div>
-                <div class="st-item">
-                    <i class="fa-solid fa-location-dot st-pin"></i>
-                    <i class="fa-solid fa-user-tie st-ico"></i>
-                    <h4>Expert team</h4>
-                    <p>Led by an experienced management team</p>
-                </div>
-                <div class="st-item">
-                    <i class="fa-solid fa-location-dot st-pin"></i>
-                    <i class="fa-solid fa-shield-heart st-ico"></i>
-                    <h4>Always with you</h4>
-                    <p>We are there if anything unexpected occurs on your trip</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="about-body-footer wow fadeInUp" data-wow-delay="0.6s">
-            <a href="{% url 'contact' %}" class="btn-default">contact us</a>
-            <!-- Book Now opens the booking modal from base.html -->
-            <a href="#" class="btn-default btn-book open-booking">book now</a>
-        </div>
-
-    </div>
-</div>
-
-                        
+                    <div class="st-route wow fadeInUp" data-wow-delay="0.4s">
+                        <div class="st-grid">
+                            <div class="st-item">
+                                <i class="fa-solid fa-award st-ico"></i>
+                                <h4>Top quality</h4>
+                                <p>Travel services of the highest quality</p>
+                            </div>
+                            <div class="st-item">
+                                <i class="fa-solid fa-headset st-ico"></i>
+                                <h4>Great service</h4>
+                                <p>Excellence in customer service is our mantra</p>
+                            </div>
+                            <div class="st-item">
+                                <i class="fa-solid fa-user-tie st-ico"></i>
+                                <h4>Expert team</h4>
+                                <p>Led by an experienced management team</p>
+                            </div>
+                            <div class="st-item">
+                                <i class="fa-solid fa-shield-heart st-ico"></i>
+                                <h4>Always with you</h4>
+                                <p>We are there if anything unexpected occurs on your trip</p>
+                            </div>
+                        </div>
                     </div>
+
+                    <div class="about-body-footer wow fadeInUp" data-wow-delay="0.6s">
+                        <a href="{% url 'contact' %}" class="btn-default">contact us</a>
+                        <!-- Book Now opens the booking modal from base.html -->
+                        <a href="#" class="btn-default btn-book open-booking">book now</a>
+                    </div>
+
                 </div>
             </div>
+
         </div>
     </div>
 </div>
+<!-- Our Story End -->
 
 <!-- Malabaroutes Services -->
 <div class="our-services bg-section ms-services">
@@ -1669,6 +1743,32 @@
 {% endblock %}
 
 {% block extra_js %}
+<!-- Our Story: Read more / Read less -->
+<script>
+    (function () {
+        var text = document.getElementById('stText');
+        var btn  = document.getElementById('stMore');
+        if (!text || !btn) return;
+
+        /* hide the button if the text already fits in the collapsed lines */
+        function check() {
+            if (!text.classList.contains('collapsed')) return;
+            btn.style.display = (text.scrollHeight <= text.clientHeight + 2) ? 'none' : '';
+        }
+
+        btn.addEventListener('click', function () {
+            var open = text.classList.toggle('collapsed') === false;
+            btn.classList.toggle('open', open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+            btn.querySelector('span').textContent = open ? 'Read less' : 'Read more';
+        });
+
+        window.addEventListener('load', check);
+        window.addEventListener('resize', check);
+        check();
+    })();
+</script>
+
 <!-- Terms & Conditions: items become active one by one, in a loop -->
 <script>
     (function () {
